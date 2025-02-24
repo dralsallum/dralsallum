@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Mario",
+    "price": "125"
+  },
+
+  {
+    "name": "TNT",
+    "price": "125"
+  },
+
+  {
+    "name": "Rick",
+    "price": "125"
+  },
+  {
+    "name": "GameOver",
+    "price": "180"
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Red",
+    "price": "800"
+  },
+
+  {
+    "name": "Blue",
+    "price": "800"
+  },
+
+  {
+    "name": "White",
+    "price": "800"
+  },
+  {
+    "name": "Pink",
+    "price": "800"
+  }
+]

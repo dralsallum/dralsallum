@@ -1,0 +1,19 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /login/
+Disallow: /private/
+Disallow: /tmp/
+Disallow: /test/
+
+# Allow all other content to be indexed
+Allow: /
+
+# Specific rules for different bots
+User-agent: Googlebot
+Disallow: /no-google/
+
+User-agent: Bingbot
+Disallow: /no-bing/
+
+# Sitemap location
+Sitemap: https://wuay.net/sitemap.xml
