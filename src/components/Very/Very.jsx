@@ -1,11 +1,46 @@
 import React, { useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import Charcter from "../../assets/hero-saud.png";
 import Avatar from "../../assets/Avatars.png";
-import Plan from "../../assets/plane.png"; // New import for the plan image
+import Plan from "../../assets/plane.png";
 import NavTech from "../NavTech/NavTech";
 import { publicRequest } from "../../requestMethods";
 
+// -------------------------
+// Loading Bar Animation
+// -------------------------
+const loadAnim = keyframes`
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+`;
+
+const LoadingBarContainer = styled.div`
+  width: 100%;
+  height: 4px;
+  background-color: #ddd;
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+  margin-bottom: 1rem;
+`;
+
+const LoadingIndicator = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background-color: #87ceeb;
+  animation: ${loadAnim} 1.5s infinite;
+`;
+
+// -------------------------
+// Main Styled Components
+// -------------------------
 const ContainerAll = styled.div`
   direction: rtl;
   margin: 20px 30px;
@@ -205,6 +240,11 @@ const SubscribeBtn = styled.button`
   font-weight: 500;
   cursor: pointer;
   margin-bottom: 1rem;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `;
 
 const PrivacyText = styled.p`
@@ -219,31 +259,48 @@ const PrivacyText = styled.p`
   }
 `;
 
+// Success message styling
+const SuccessMessage = styled.p`
+  color: green;
+  text-align: center;
+  margin-bottom: 1rem;
+`;
+
+// -------------------------
+// Main Component
+// -------------------------
 const Very = () => {
   // State to hold the email input
   const [email, setEmail] = useState("");
 
-  // Toggle for your nav menu (not directly related to the email submission)
-  const [isMenuOpen, setMenuOpen] = useState(false);
-  const toggleMenu = () => {
-    setMenuOpen((prev) => !prev);
-  };
+  // Loading and Success states
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   // Handler function when user clicks "اشترك"
   const handleSubscribe = async () => {
-    if (!email) return alert("الرجاء إدخال بريد إلكتروني");
+    if (!email) {
+      alert("الرجاء إدخال بريد إلكتروني");
+      return;
+    }
+
+    // Reset any previous success message
+    setSuccess(false);
+    setLoading(true);
 
     try {
-      // Make a POST request to /apply with the email
+      // Make a POST request to /applies with the email
       const response = await publicRequest.post("/applies", { email });
       console.log("Email saved:", response.data);
 
-      // Optionally, clear the email input and show success
+      // Clear the email input and show success
       setEmail("");
-      alert("تم الاشتراك بنجاح! شكراً لك.");
+      setSuccess(true);
     } catch (error) {
       console.error("Error saving email:", error);
       alert("حدث خطأ أثناء الاشتراك. يرجى المحاولة لاحقًا.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -288,7 +345,6 @@ const Very = () => {
               الجودة من جميع أنحاء الويب مباشرة إلى بريدك الإلكتروني.
             </NewsletterDescription>
 
-            {/* Bind the input value to `email` and update onChange */}
             <EmailInput
               type="email"
               placeholder="بريدك الإلكتروني"
@@ -296,8 +352,21 @@ const Very = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
 
-            {/* Call handleSubscribe on button click */}
-            <SubscribeBtn onClick={handleSubscribe}>اشترك</SubscribeBtn>
+            {/* Show the loading bar if loading is true */}
+            {loading && (
+              <LoadingBarContainer>
+                <LoadingIndicator />
+              </LoadingBarContainer>
+            )}
+
+            <SubscribeBtn onClick={handleSubscribe} disabled={loading}>
+              {loading ? "جاري الاشتراك..." : "اشترك"}
+            </SubscribeBtn>
+
+            {/* Show success message if subscription succeeded */}
+            {success && (
+              <SuccessMessage>تم الاشتراك بنجاح! شكراً لك.</SuccessMessage>
+            )}
 
             <PrivacyText>
               من خلال تقديم هذا النموذج، ستقوم بالاشتراك في النشرة الإخبارية
