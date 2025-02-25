@@ -235,7 +235,7 @@ const Very = () => {
 
     try {
       // Make a POST request to /apply with the email
-      const response = await publicRequest.post("/apply", { email });
+      const response = await publicRequest.post("/applies", { email });
       console.log("Email saved:", response.data);
 
       // Optionally, clear the email input and show success
