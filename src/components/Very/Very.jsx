@@ -39,6 +39,28 @@ const LoadingIndicator = styled.div`
 `;
 
 // -------------------------
+// Success Message Animation
+// -------------------------
+const scaleAnim = keyframes`
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1); 
+  }
+  100% {
+    transform: scale(1);
+  }
+`;
+
+const SuccessMessage = styled.p`
+  color: green;
+  text-align: center;
+  margin-bottom: 1rem;
+  animation: ${scaleAnim} 1.5s ease-in-out infinite;
+`;
+
+// -------------------------
 // Main Styled Components
 // -------------------------
 const ContainerAll = styled.div`
@@ -259,20 +281,9 @@ const PrivacyText = styled.p`
   }
 `;
 
-// Success message styling
-const SuccessMessage = styled.p`
-  color: green;
-  text-align: center;
-  margin-bottom: 1rem;
-`;
-
-// -------------------------
-// Main Component
-// -------------------------
 const Very = () => {
   // State to hold the email input
   const [email, setEmail] = useState("");
-
   // Loading and Success states
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
