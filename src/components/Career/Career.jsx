@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addProduct } from "../../redux/cartRedux"; // <-- import your addProduct action
+import { addProduct } from "../../redux/cartRedux"; // <-- استيراد إجراء addProduct
 import NavTech from "../NavTech/NavTech";
 
-/* Container (full page) */
+/* الحاوية (الصفحة الكاملة) */
 const ContainerAll = styled.div`
   direction: rtl;
   margin: 20px 30px;
   background: #f8f6f2;
   border-radius: 16px;
   overflow: hidden;
-  position: relative; /* Needed for the mobile menu positioning */
+  position: relative; /* ضروري لتحديد موضع القائمة على الجوال */
 
   @media (max-width: 768px) {
     margin: 10px 15px;
@@ -23,7 +23,7 @@ const ContainerAll = styled.div`
   }
 `;
 
-/* ... other styled components unchanged ... */
+/* ... باقي مكونات الستايل تبقى دون تغيير ... */
 
 const HeroSection = styled.section`
   max-width: 1200px;
@@ -77,7 +77,7 @@ const VideoWrapper = styled.div`
   background: #eaeaea;
   border-radius: 8px;
   overflow: hidden;
-  height: 340px; /* Approx aspect ratio for placeholder */
+  height: 340px; /* نسبة العرض إلى الارتفاع التقريبية للمؤقت */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,20 +90,20 @@ const Career = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Handler to add product to the cart (Redux) and navigate to checkout
+  // دالة لإضافة المنتج إلى السلة (Redux) والتوجه إلى صفحة الدفع
   const handleEnroll = () => {
-    // Example product object:
+    // كائن المنتج المثال:
     const product = {
       _id: "PTYA001",
-      title: "Part-Time YouTuber Academy",
+      title: "أكاديمية اليوتيوبر بدوام جزئي",
       price: 995,
       quantity: 1,
     };
 
-    // Dispatch to Redux
+    // إرسال المنتج إلى Redux
     dispatch(addProduct(product));
 
-    // Optionally redirect to Checkout page
+    // إعادة التوجيه إلى صفحة الدفع
     navigate("/outcome");
   };
 
@@ -111,19 +111,21 @@ const Career = () => {
     <ContainerAll>
       <NavTech />
 
-      {/* Hero Section */}
+      {/* قسم البطل */}
       <HeroSection>
-        <HeroHeading>Join The Part-Time YouTuber Academy</HeroHeading>
+        <HeroHeading>انضم إلى أكاديمية اليوتيوبر بدوام جزئي</HeroHeading>
         <HeroSubheading>
-          Discover the proven strategies and techniques to thrive on YouTube —
-          without <em>quitting your day job</em>
+          اكتشف الاستراتيجيات والتقنيات المثبتة لتحقيق النجاح على يوتيوب — دون
+          التخلي عن عملك اليومي
         </HeroSubheading>
 
-        {/* Button triggers addProduct action & then navigates to Checkout */}
-        <EnrollButton onClick={handleEnroll}>Enroll Now for $995</EnrollButton>
+        {/* الزر يقوم بتشغيل إجراء addProduct ثم ينتقل إلى صفحة الدفع */}
+        <EnrollButton onClick={handleEnroll}>
+          سجل الآن مقابل 995 دولار
+        </EnrollButton>
 
-        {/* Placeholder for video or image */}
-        <VideoWrapper>Video Placeholder</VideoWrapper>
+        {/* عنصر نائب للفيديو أو الصورة */}
+        <VideoWrapper>عنصر نائب للفيديو</VideoWrapper>
       </HeroSection>
     </ContainerAll>
   );

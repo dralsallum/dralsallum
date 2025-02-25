@@ -1,7 +1,7 @@
 // AboutAli.jsx
 import React from "react";
 import styled from "styled-components";
-import Charcter from "../../assets/hero-ali.webp";
+import Charcter from "../../assets/hero-saud.png";
 
 const AboutContainer = styled.section`
   background: #edf4f7;
@@ -20,11 +20,11 @@ const AboutContainer = styled.section`
     margin: 10px 15px;
     border-radius: 10px;
     flex-direction: column;
-    text-align: center; /* On mobile, text will center-align */
+    text-align: center; /* على الجوال، سيتم توسيط النص */
   }
 `;
 
-/* Circle image wrapper */
+/* تغليف الصورة الدائرية */
 const ImageWrapper = styled.div`
   width: 300px;
   height: 300px;
@@ -46,15 +46,11 @@ const ProfileImage = styled.img`
 `;
 
 /* 
-  Text content: remove `flex: 1;` so it doesn't stretch, 
-  give it a max width, and center it within the flex layout 
+  محتوى النص: إزالة `flex: 1;` حتى لا يتمدد،
+  تحديد الحد الأقصى للعرض وتوسيطه داخل التخطيط المرن
 */
 const TextContent = styled.div`
   max-width: 600px;
-
-  /* If you'd like text centered on desktop too, uncomment:
-     text-align: center; 
-   */
 `;
 
 const SubTitle = styled.h3`
@@ -75,33 +71,31 @@ export default function AboutAli() {
   return (
     <AboutContainer>
       <ImageWrapper>
-        <ProfileImage src={Charcter} alt="Profile" />
+        <ProfileImage src={Charcter} alt="الملف الشخصي" />
       </ImageWrapper>
 
       <TextContent>
         <SubTitle>
-          A YouTube Channel Can Completely Change Your Life – It Changed Mine
+          قناة يوتيوب يمكن أن تغير حياتك تمامًا – لقد غيرت حياتي
         </SubTitle>
 
         <Paragraph>
-          I started making YouTube videos in 2017, while in my final year of
-          medical school at Cambridge University.
+          بدأت في صنع فيديوهات يوتيوب في عام 2017، أثناء عامي الأخير في كلية
+          الطب بجامعة كامبريدج.
         </Paragraph>
         <Paragraph>
-          I started off with <strong>0 views</strong>,{" "}
-          <strong>0 subscribers</strong> and <strong>$0</strong> in revenue. I
-          knew absolutely nothing about filming, editing, or publishing videos.
+          بدأت من الصفر: <strong>0 مشاهدة</strong>، <strong>0 مشترك</strong> و
+          <strong>0 دولار</strong> كإيرادات. لم أكن أعرف شيئًا عن التصوير أو
+          المونتاج أو نشر الفيديوهات.
         </Paragraph>
         <Paragraph>
-          But after watching hundreds of tutorials on YouTube, I figured out the
-          basics. 18 months later, my channel reached{" "}
-          <strong>100,000 subscribers</strong> and was making as much money as
-          my full-time job working as a doctor.
+          لكن بعد مشاهدة مئات الدروس على يوتيوب، تعلمت الأساسيات. بعد 18 شهرًا،
+          وصل عدد مشتركي قناتي إلى <strong>100,000 مشترك</strong> وأصبحت أرباحها
+          تعادل راتبي كطبيب بدوام كامل.
         </Paragraph>
         <Paragraph>
-          Two years later, I hit <strong>1 million subscribers</strong>,{" "}
-          <strong>$1m in annual revenue</strong>, and finally made the leap to
-          go all-in on YouTube.
+          وبعد عامين، تجاوز عدد المشتركين المليون، وبلغت الإيرادات السنوية{" "}
+          <strong>مليون دولار</strong>، وأخيرًا قررت الالتزام الكامل بيوتيوب.
         </Paragraph>
       </TextContent>
     </AboutContainer>
