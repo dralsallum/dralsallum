@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import styled, { keyframes } from "styled-components";
+import React, { useState, useRef, useEffect } from "react";
+import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addProduct } from "../../redux/cartRedux"; // <-- استيراد إجراء addProduct
+import { addProduct } from "../../redux/cartRedux";
 import NavTech from "../NavTech/NavTech";
 
 /* الحاوية (الصفحة الكاملة) */
@@ -12,23 +12,20 @@ const ContainerAll = styled.div`
   background: #f8f6f2;
   border-radius: 16px;
   overflow: hidden;
-  position: relative; /* ضروري لتحديد موضع القائمة على الجوال */
+  position: relative;
 
   @media (max-width: 768px) {
     margin: 10px 15px;
     border-radius: 10px;
-    min-height: 100vh;
     background: #f8f6f2;
     overflow: hidden;
   }
 `;
 
-/* ... باقي مكونات الستايل تبقى دون تغيير ... */
-
 const HeroSection = styled.section`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 2rem 3rem;
+  padding: 2rem 2rem 1.5rem;
   text-align: center;
   @media (max-width: 768px) {
     padding: 1.5rem;
@@ -64,46 +61,296 @@ const EnrollButton = styled.button`
   padding: 0.75rem 1.5rem;
   cursor: pointer;
   font-weight: 600;
+
   &:hover {
     opacity: 0.9;
   }
 `;
 
-const VideoWrapper = styled.div`
-  margin-top: 2rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  background: #eaeaea;
-  border-radius: 8px;
+/* ======================
+   === Video Player ===
+   ====================== */
+
+const VideoPlayerContainer = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 768px;
+  margin: 2rem auto 1rem;
+  border-radius: 12px;
   overflow: hidden;
-  height: 340px; /* نسبة العرض إلى الارتفاع التقريبية للمؤقت */
+  background-color: #000;
+  aspect-ratio: 16 / 9;
+`;
+
+const StyledVideo = styled.video`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  outline: none;
+`;
+
+const ThumbnailOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("THUMBNAIL_URL") center center / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #777;
-  font-weight: 600;
+  cursor: pointer;
 `;
 
+const BigPlayButton = styled.div`
+  width: 80px;
+  height: 80px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+`;
+
+/* شريط التحكم السفلي */
+const ControlsContainer = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /* نضبط الإتجاه هنا بحيث تكون الأزرار من اليسار لليمين */
+  direction: ltr;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  padding: 8px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+`;
+
+const ProgressBar = styled.input.attrs({ type: "range" })`
+  flex: 1;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 4px;
+  margin: 0;
+
+  &::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+  }
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 14px;
+    width: 14px;
+    background: #ff7143;
+    border-radius: 50%;
+    margin-top: -5px;
+    border: 2px solid #fff;
+  }
+`;
+
+const TimeLabel = styled.div`
+  color: #fff;
+  font-size: 14px;
+  min-width: 70px;
+  text-align: center;
+`;
+
+const IconButton = styled.button`
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+
+  &:hover {
+    color: #ff7143;
+  }
+`;
+
+const FullscreenButton = styled(IconButton)``;
+
+const VideoPlayer = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+
+  const videoRef = useRef(null);
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  const formatTime = (seconds) => {
+    if (!seconds) return "0:00";
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    if (h > 0) {
+      return `${h}:${m.toString().padStart(2, "0")}:${s
+        .toString()
+        .padStart(2, "0")}`;
+    }
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const handlePlayPause = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const handleThumbnailClick = () => {
+    handlePlayPause();
+  };
+
+  const handleProgressChange = (e) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = e.target.value;
+      setCurrentTime(e.target.value);
+    }
+  };
+
+  const handleMuteClick = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
+
+  const handleFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      if (videoRef.current?.parentNode?.requestFullscreen) {
+        videoRef.current.parentNode.requestFullscreen();
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (videoRef.current) {
+      const handlePause = () => setIsPlaying(false);
+      const handleEnded = () => setIsPlaying(false);
+
+      videoRef.current.addEventListener("pause", handlePause);
+      videoRef.current.addEventListener("ended", handleEnded);
+
+      return () => {
+        videoRef.current.removeEventListener("pause", handlePause);
+        videoRef.current.removeEventListener("ended", handleEnded);
+      };
+    }
+  }, []);
+
+  return (
+    <VideoPlayerContainer>
+      <StyledVideo
+        ref={videoRef}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        muted={isMuted}
+      >
+        <source
+          src="https://alsallum.s3.eu-north-1.amazonaws.com/fluentfox_ad.mp4"
+          type="video/mp4"
+        />
+        متصفحك لا يدعم تشغيل الفيديو.
+      </StyledVideo>
+
+      {/* Overlay thumbnail with big play button (only before first playback) */}
+      {!isPlaying && currentTime === 0 && (
+        <ThumbnailOverlay onClick={handleThumbnailClick}>
+          <BigPlayButton>▶</BigPlayButton>
+        </ThumbnailOverlay>
+      )}
+
+      {/* Bottom control bar */}
+      <ControlsContainer>
+        {/* Play/Pause on the far left */}
+        <IconButton onClick={handlePlayPause}>
+          {isPlaying ? "⏸" : "▶"}
+        </IconButton>
+
+        {/* Progress bar in the middle (flex: 1) */}
+        <ProgressBar
+          min="0"
+          max={duration}
+          step="0.1"
+          value={currentTime}
+          onChange={handleProgressChange}
+        />
+
+        {/* Group the time, mute, fullscreen on the far right */}
+        <div
+          style={{
+            marginLeft: "auto",
+            display: "flex",
+            gap: "8px",
+            alignItems: "center",
+          }}
+        >
+          <TimeLabel>
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </TimeLabel>
+
+          <IconButton onClick={handleMuteClick}>
+            {isMuted ? "🔇" : "🔊"}
+          </IconButton>
+
+          <FullscreenButton onClick={handleFullscreen}>⛶</FullscreenButton>
+        </div>
+      </ControlsContainer>
+    </VideoPlayerContainer>
+  );
+};
+
+/* ======================
+   === Career Section ===
+   ====================== */
 const Career = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // دالة لإضافة المنتج إلى السلة (Redux) والتوجه إلى صفحة الدفع
   const handleEnroll = () => {
-    // كائن المنتج المثال:
     const product = {
       _id: "PTYA001",
       title: "أكاديمية اليوتيوبر بدوام جزئي",
       price: 995,
       quantity: 1,
     };
-
-    // إرسال المنتج إلى Redux
     dispatch(addProduct(product));
-
-    // إعادة التوجيه إلى صفحة الدفع
     navigate("/outcome");
   };
 
@@ -111,7 +358,6 @@ const Career = () => {
     <ContainerAll>
       <NavTech />
 
-      {/* قسم البطل */}
       <HeroSection>
         <HeroHeading>انضم إلى أكاديمية اليوتيوبر بدوام جزئي</HeroHeading>
         <HeroSubheading>
@@ -119,13 +365,11 @@ const Career = () => {
           التخلي عن عملك اليومي
         </HeroSubheading>
 
-        {/* الزر يقوم بتشغيل إجراء addProduct ثم ينتقل إلى صفحة الدفع */}
         <EnrollButton onClick={handleEnroll}>
           سجل الآن مقابل 995 دولار
         </EnrollButton>
 
-        {/* عنصر نائب للفيديو أو الصورة */}
-        <VideoWrapper>عنصر نائب للفيديو</VideoWrapper>
+        <VideoPlayer />
       </HeroSection>
     </ContainerAll>
   );
