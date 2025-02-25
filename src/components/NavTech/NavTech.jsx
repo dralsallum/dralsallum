@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import logo from "../../assets/drslallum.png";
 
-/* ====== Styled Components for Navbar ====== */
+/* ====== المكونات المُنسقة لشريط التنقل ====== */
 const Header = styled.header`
   display: flex;
   flex-direction: row-reverse;
@@ -11,23 +11,24 @@ const Header = styled.header`
   align-items: center;
   padding: 1rem 2rem;
   background: #f8f6f2;
+  direction: rtl;
 
   @media (max-width: 768px) {
     padding: 1rem;
   }
 `;
 
-/* Make Logo a Link component so it navigates to /home */
+/* جعل الشعار عنصر Link للتنقل إلى الصفحة الرئيسية */
 const Logo = styled(Link)`
   display: flex;
   align-items: center;
   font-size: 1.5rem;
   font-weight: bold;
   color: #000;
-  text-decoration: none; /* Remove underline from link */
+  text-decoration: none; /* إزالة التسطير من الرابط */
 `;
 
-// Styled component for the logo image
+// مكون مُنسق لصورة الشعار
 const LogoImage = styled.img`
   width: 200px;
   height: auto;
@@ -43,7 +44,7 @@ const NavLinks = styled.nav`
   gap: 1.5rem;
 
   @media (max-width: 768px) {
-    display: none; /* Hide on mobile (we'll use the mobile menu button) */
+    display: none; /* إخفاؤها على الجوال (سيتم استخدام زر القائمة) */
   }
 `;
 
@@ -67,7 +68,7 @@ const SubscribeButton = styled.button`
   font-size: 0.9rem;
 
   @media (max-width: 768px) {
-    display: none; /* Hide on mobile */
+    display: none; /* إخفاؤها على الجوال */
   }
 `;
 
@@ -94,7 +95,7 @@ const MobileMenuContainer = styled.div`
     display: block;
     background: #fff;
     position: absolute;
-    top: 70px; /* Adjust based on header height */
+    top: 70px; /* تعديل وفقًا لارتفاع الهيدر */
     right: 1rem;
     left: 1rem;
     z-index: 999;
@@ -134,43 +135,43 @@ const NavTech = () => {
   return (
     <>
       <Header>
-        {/* Logo now wrapped in a Link */}
+        {/* الشعار مغلف الآن بعنصر Link */}
         <Logo to="/">
-          <LogoImage src={logo} alt="Dralsallum Logo" />
+          <LogoImage src={logo} alt="شعار درس السلوم" />
         </Logo>
 
-        {/* Desktop Nav */}
+        {/* قائمة التنقل لسطح المكتب */}
         <NavLinks>
-          <NavLink href="#">My Book</NavLink>
-          <NavLink href="#">Free Resources</NavLink>
-          <NavLink href="#">YouTube Academy</NavLink>
-          <NavLink href="#">Productivity Lab</NavLink>
-          <NavLink href="#">LifeOS</NavLink>
+          <NavLink href="#">كتابي</NavLink>
+          <NavLink href="#">موارد مجانية</NavLink>
+          <NavLink href="#">أكاديمية يوتيوب</NavLink>
+          <NavLink href="#">مختبر الإنتاجية</NavLink>
+          <NavLink href="#">لايف أو إس</NavLink>
         </NavLinks>
 
-        {/* Subscribe & Mobile Toggle */}
-        <SubscribeButton>Join 260k+ Subscribers</SubscribeButton>
+        {/* زر الاشتراك وتبديل القائمة للجوال */}
+        <SubscribeButton>انضم إلى أكثر من 260 ألف مشترك</SubscribeButton>
         <MenuButton onClick={toggleMenu}>☰</MenuButton>
       </Header>
 
-      {/* Mobile Menu (conditionally shown) */}
+      {/* قائمة الهاتف (تظهر بناءً على الشرط) */}
       {isMenuOpen && (
         <MobileMenuContainer>
           <MobileMenuList>
             <MobileMenuItem>
-              <a href="#">My Book</a>
+              <a href="#">كتابي</a>
             </MobileMenuItem>
             <MobileMenuItem>
-              <a href="#">Free Resources</a>
+              <a href="#">موارد مجانية</a>
             </MobileMenuItem>
             <MobileMenuItem>
-              <a href="#">YouTube Academy</a>
+              <a href="#">أكاديمية يوتيوب</a>
             </MobileMenuItem>
             <MobileMenuItem>
-              <a href="#">Productivity Lab</a>
+              <a href="#">مختبر الإنتاجية</a>
             </MobileMenuItem>
             <MobileMenuItem>
-              <a href="#">LifeOS</a>
+              <a href="#">لايف أو إس</a>
             </MobileMenuItem>
           </MobileMenuList>
         </MobileMenuContainer>
