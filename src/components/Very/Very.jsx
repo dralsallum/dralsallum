@@ -375,9 +375,7 @@ const Very = () => {
             </SubscribeBtn>
 
             {/* Show success message if subscription succeeded */}
-            {success && (
-              <SuccessMessage>تم الاشتراك بنجاح! شكراً لك.</SuccessMessage>
-            )}
+            {success && <SuccessMessage>تم الاشتراك بنجاح!</SuccessMessage>}
 
             <PrivacyText>
               من خلال تقديم هذا النموذج، ستقوم بالاشتراك في النشرة الإخبارية
