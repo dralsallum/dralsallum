@@ -87,6 +87,7 @@ const Heading = styled.h1`
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
+    margin-bottom: 0.5rem;
   }
 `;
 
@@ -103,6 +104,7 @@ const Description = styled.p`
 
   @media (max-width: 768px) {
     font-size: 1.1rem;
+    margin-bottom: 1rem;
   }
 `;
 
@@ -237,9 +239,8 @@ const Very = () => {
             مرحبًا أصدقائي! <Underline></Underline>
           </Heading>
           <Description>
-            أنا سعود. أنا طبيب تحول إلى رائد أعمال، وصانع محتوى على يوتيوب،
-            ومؤلف أكثر الكتب مبيعًا في نيويورك تايمز "إنتاجية تبعث على الشعور
-            بالراحة".
+            أنا سعود. طبيب رائد أعمال، وصانع محتوى على يوتيوب، ومؤلف أكثر الكتب
+            مبيعًا في نيويورك تايمز "إنتاجية تبعث على الشعور بالراحة".
           </Description>
 
           <NewsletterSection>
