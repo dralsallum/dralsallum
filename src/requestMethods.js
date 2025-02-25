@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://personality-fcc580806969.herokuapp.com/api";
+const BASE_URL = "https://dralsallumapi-8efe1bd8f8df.herokuapp.com/api";
 
 const user = JSON.parse(localStorage.getItem("persist:root"))?.user;
 const currentUser = user && JSON.parse(user).currentUser;

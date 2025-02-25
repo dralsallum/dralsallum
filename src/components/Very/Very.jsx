@@ -4,6 +4,7 @@ import Charcter from "../../assets/hero-saud.png";
 import Avatar from "../../assets/Avatars.png";
 import Plan from "../../assets/plane.png"; // New import for the plan image
 import NavTech from "../NavTech/NavTech";
+import { publicRequest } from "../../requestMethods";
 
 const ContainerAll = styled.div`
   direction: rtl;
@@ -219,10 +220,31 @@ const PrivacyText = styled.p`
 `;
 
 const Very = () => {
-  const [isMenuOpen, setMenuOpen] = useState(false);
+  // State to hold the email input
+  const [email, setEmail] = useState("");
 
+  // Toggle for your nav menu (not directly related to the email submission)
+  const [isMenuOpen, setMenuOpen] = useState(false);
   const toggleMenu = () => {
     setMenuOpen((prev) => !prev);
+  };
+
+  // Handler function when user clicks "اشترك"
+  const handleSubscribe = async () => {
+    if (!email) return alert("الرجاء إدخال بريد إلكتروني");
+
+    try {
+      // Make a POST request to /apply with the email
+      const response = await publicRequest.post("/apply", { email });
+      console.log("Email saved:", response.data);
+
+      // Optionally, clear the email input and show success
+      setEmail("");
+      alert("تم الاشتراك بنجاح! شكراً لك.");
+    } catch (error) {
+      console.error("Error saving email:", error);
+      alert("حدث خطأ أثناء الاشتراك. يرجى المحاولة لاحقًا.");
+    }
   };
 
   return (
@@ -254,8 +276,8 @@ const Very = () => {
             <ReviewSection>
               <ReviewImages>
                 <img src={Avatar} alt="Reviewer 1" />
-                <img src={Avatar} alt="Reviewer 1" />
-                <img src={Avatar} alt="Reviewer 1" />
+                <img src={Avatar} alt="Reviewer 2" />
+                <img src={Avatar} alt="Reviewer 3" />
               </ReviewImages>
               <Stars>★★★★★</Stars>
               <span>200+ مراجعات</span>
@@ -266,8 +288,17 @@ const Very = () => {
               الجودة من جميع أنحاء الويب مباشرة إلى بريدك الإلكتروني.
             </NewsletterDescription>
 
-            <EmailInput type="email" placeholder="بريدك الإلكتروني" />
-            <SubscribeBtn>اشترك</SubscribeBtn>
+            {/* Bind the input value to `email` and update onChange */}
+            <EmailInput
+              type="email"
+              placeholder="بريدك الإلكتروني"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            {/* Call handleSubscribe on button click */}
+            <SubscribeBtn onClick={handleSubscribe}>اشترك</SubscribeBtn>
+
             <PrivacyText>
               من خلال تقديم هذا النموذج، ستقوم بالاشتراك في النشرة الإخبارية
               المجانية. قد أرسل لك أيضًا رسائل بريد إلكتروني أخرى حول دوراتي.
