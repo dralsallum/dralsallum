@@ -90,7 +90,7 @@ const HeaderText = styled.div`
 
   @media (max-width: 768px) {
     margin-left: 0;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 `;
 
@@ -100,6 +100,9 @@ const HeaderImage = styled.img`
   height: auto;
   object-fit: cover;
   border-radius: 8px;
+  @media (max-width: 768px) {
+    width: 250px;
+  }
 `;
 
 const Title = styled.h1`
