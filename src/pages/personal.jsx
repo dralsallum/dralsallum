@@ -1,11 +1,12 @@
 import React from "react";
-import { NavTech, Personality } from "../components";
+import { Breath, Footer, NavTech, Personality } from "../components";
 
 const Personal = () => {
   return (
     <>
-      <NavTech />
       <Personality />
+      <Breath />
+      <Footer />
     </>
   );
 };

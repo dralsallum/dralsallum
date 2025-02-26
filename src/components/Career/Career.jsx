@@ -260,16 +260,18 @@ const VideoPlayer = () => {
   };
 
   useEffect(() => {
-    if (videoRef.current) {
+    const videoElement = videoRef.current;
+    if (videoElement) {
       const handlePause = () => setIsPlaying(false);
       const handleEnded = () => setIsPlaying(false);
 
-      videoRef.current.addEventListener("pause", handlePause);
-      videoRef.current.addEventListener("ended", handleEnded);
+      videoElement.addEventListener("pause", handlePause);
+      videoElement.addEventListener("ended", handleEnded);
 
       return () => {
-        videoRef.current.removeEventListener("pause", handlePause);
-        videoRef.current.removeEventListener("ended", handleEnded);
+        // Use the captured reference to remove the listeners
+        videoElement.removeEventListener("pause", handlePause);
+        videoElement.removeEventListener("ended", handleEnded);
       };
     }
   }, []);

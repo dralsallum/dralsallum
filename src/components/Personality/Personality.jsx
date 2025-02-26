@@ -1,618 +1,366 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  QuizBody,
-  ScoreSection,
-  QuestionSection,
-  QuestionCount,
-  QuestionCountSpan,
-  QuestionBut,
-  AnswerSection,
-  ResMid,
-  ResTySp,
-  QuizFieldset,
-  QuizDiv,
-  ScoreSectionbackground,
-  ScoreSectionProgress,
-  ScoreSectioTwo,
-  QuizCon,
-  FieldDiv,
-  ResCon,
-  ResBox,
-  ResBot,
-  ResBor,
-  ResHr,
-  ResCar,
-  ResFie,
-  ResAll,
-  ResTop,
-  ResTit,
-  ResSubTit,
-  ResTyCon,
-  ResImg,
-  ResOp,
-  ResOpBut,
-  ResRoof,
-  ResDot,
-  QueSpa,
-  IntroBod,
-  IntroText,
-  Intro,
-  OpCon,
-  OpMain,
-  OpImg,
-  OpText,
-  OpSubText,
-  LoginSignInput,
-  LoginSignSubHeader,
-  RegistarButton,
-  ProgressCal,
-  ProgressCon,
-  StyledSpinner,
-  Loading,
-  LoadingBar,
-  QuizHe,
-  QuizPara,
-  ShareIcon,
-  ShareTit,
-  ShareCon,
-} from "./Personality.elements";
-import {
-  FacebookShareButton,
-  TwitterShareButton,
-  WhatsappShareButton,
-  FacebookIcon,
-  TwitterIcon,
-  WhatsappIcon,
-} from "react-share";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import statements from "../../utils/statements";
-import statements2 from "../../utils/statements2";
-import statements3 from "../../utils/statements3";
-import statements4 from "../../utils/statements4";
-import statements5 from "../../utils/statements5";
-import charact1 from "../../assets/character1.png";
-import charact2 from "../../assets/character2.png";
-import charact3 from "../../assets/character3.png";
-import charact4 from "../../assets/character4.png";
-import charact5 from "../../assets/character5.png";
-import charact6 from "../../assets/character6.png";
-import charact7 from "../../assets/character7.png";
-import charact8 from "../../assets/character8.png";
-import charact9 from "../../assets/character9.png";
-import charact10 from "../../assets/character10.png";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { register } from "../../redux/userRedux";
-import { setQuizResults, setResultText } from "../../redux/quizSlice";
-import Social from "../Social/Social";
+import React, { useState, useRef, useEffect } from "react";
+import styled from "styled-components";
+import { Link } from "react-router-dom";
+import NavTech from "../NavTech/NavTech";
 
-const Personality = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState(Array(statements.length).fill(0));
-  const [showScore, setShowScore] = useState(false);
-  const [score, setScore] = useState(0);
-  const [currentStatements, setCurrentStatements] = useState(statements);
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  const [resultPage, setResultPage] = useState(0);
-  const [inputs, setInputs] = useState({});
-  const [isRegistering, setIsRegistering] = useState(false);
-  const currentTeam = useSelector((state) => state.quiz.resultText.team);
-  const dispatch = useDispatch();
+/* الحاوية (الصفحة الكاملة) */
+const ContainerAll = styled.div`
+  direction: rtl;
+  margin: 20px 30px;
+  background: #f8f6f2;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
 
-  const navigate = useNavigate();
+  @media (max-width: 768px) {
+    margin: 10px 15px;
+    border-radius: 10px;
+    background: #f8f6f2;
+    overflow: hidden;
+  }
+`;
 
-  const calculateTotalScore = () => {
-    return answers.reduce((total, answer) => {
-      const questionScore = answer;
-      return total + questionScore;
-    }, 0);
-  };
+const HeroSection = styled.section`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 2rem 1.5rem;
+  text-align: center;
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+`;
 
-  const renderResultContent = () => {
-    const scoreDetails = getScoreDetails();
+const HeroHeading = styled.h1`
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #000;
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+`;
 
-    const quotesAndSpells = {
-      range1: {
-        team: "المنطقي",
-        title: "شخصيتك هي",
-        banner: "نتائج اختبار الشخصية",
-        quote:
-          "عملي ومحب للحقائق. يتميز بالثبات والموثوقية، ويقدر النزاهة والمسؤولية. يجيد التخطيط وتنظيم المهام بكفاءة",
-        spell:
-          "يقدر التعامل العقلاني والمنظم، ويفضل النقاشات المبنية على الحقائق والواقعية. يحب الأشخاص الذين يظهرون الصدق والموثوقية ويكرهون التسرع والتهور في القرارات. يفضلون التخطيط المسبق وتقدير الجهود التي يبذلونها",
-      },
-      range2: {
-        team: "المدافع",
-        title: "شخصيتك هي",
-        banner: "نتائج اختبار الشخصية",
-        quote:
-          " مكرس ودافئ، ويبرز في الدفاع عن أحبائه. يتمتع بالتفاني والدعم، ويسعى دائمًا لحماية ورعاية من حوله",
-        spell:
-          "يحب التعامل الذي يتسم بالتعاطف والرعاية، ويقدر الأشخاص الذين يظهرون الاهتمام والدعم. يرغب في التقدير لجهوده والتقدير لحساسيته تجاه الآخرين. يفضل التواصل الهادئ والمتفهم",
-      },
-      range3: {
-        team: "البارع",
-        title: "شخصيتك هي",
-        banner: "نتائج اختبار الشخصية",
-        quote:
-          "جريء وعملي، متقن لجميع أنواع الأدوات. يتميز بالمرونة والقدرة على التكيف مع المواقف المختلفة بسهولة",
-        spell:
-          "يحب التعامل العملي والمباشر، ويقدر الأشخاص الذين يعتمدون على الخبرة والمهارة. يستمتع بالتحديات الجديدة ويفضل العمل مع أشخاص مبتكرين ومرنين",
-      },
-      range4: {
-        team: "المغامر",
-        title: "شخصيتك هي",
-        banner: "نتائج اختبار الشخصية",
-        quote:
-          "فنان مرن وساحر. يتمتع بحب الاستكشاف والتجارب الجديدة، ويجد السعادة في الأشياء الجميلة من حوله",
-        spell:
-          " يفضل التعامل الذي يحفز الإبداع والاستكشاف. يحب الأشخاص الذين يشاركونه حب المغامرة والاستكشاف. يقدر الحرية والتلقائية في التعبير عن الذات",
-      },
-      range5: {
-        team: "الوسيط",
-        title: "شخصيتك هي",
-        banner: "نتائج اختبار الشخصية",
-        quote:
-          "شاعري ولطيف ومحب للخير. يتحلى بالإخلاص والتعاطف، ودائمًا ما يكون مستعدًا لمساعدة القضايا النبيلة والمجتمع",
-        spell:
-          "يقدر التعامل اللطيف والداعم. يحب الأشخاص الذين يقدرون الإبداع والتعاطف. يستمتع بالعمل في بيئات تشجع على التعاون والتفاهم",
-      },
-      range6: {
-        team: "المنطقي",
-        title: "شخصيتك هي",
-        banner: "نتائج اختبار الشخصية",
-        quote:
-          "مبتكر ومخترع، لديه عطش لا ينتهي للمعرفة. يبرز في التفكير النقدي والإبداعي، ويميل إلى التفكير خارج الصندوق",
-        spell:
-          "يفضل التعامل الذي يشجع على الابتكار والمعرفة. يقدر النقاشات الفكرية ويحب الأشخاص الذين يتحدونه فكرياً. يستمتع بالتعلم والاكتشاف المستمر",
-      },
-      range7: {
-        team: "المناظر",
-        title: "شخصيتك هي",
-        banner: "نتائج اختبار الشخصية",
-        quote:
-          "فضولي وذكي، لا يمكنه مقاومة التحدي الفكري. يتمتع بقدرة عالية على التحليل والمناقشة، ويحب استكشاف الأفكار الجديدة",
-        spell:
-          "يفضل التعامل الذي يتحدى فكرياً ويحفز العقل. يحب الأشخاص الذين يقدرون النقاش العميق وتبادل الأفكار. يتجنب الأشخاص الذين لا يحبون التفكير خارج الصندوق",
-      },
-      range8: {
-        team: "التنفيذي",
-        title: "شخصيتك هي",
-        banner: "نتائج اختبار الشخصية",
-        quote:
-          "مدير ممتاز، يتفوق في إدارة الأمور والأشخاص. يتميز بقوة القيادة والكفاءة الإدارية، ويتخذ القرارات بثقة",
-        spell:
-          " يفضل التعامل الفعال والمنظم. يقدر الالتزام والكفاءة والجدية في العمل. يحب الأشخاص الذين يظهرون الاحترام والتقدير لمهاراته الإدارية",
-      },
-      range9: {
-        team: "البطل",
-        title: "شخصيتك هي",
-        banner: "نتائج اختبار الشخصية",
-        quote:
-          "قائد كاريزماتي وملهم. يتمتع بقدرة فائقة على التأثير وإلهام الآخرين، ويحب قيادة المبادرات الإيجابية",
-        spell:
-          " يفضل التعامل الذي يتضمن التحفيز والإلهام. يقدر الأشخاص الذين يدعمونه ويقدرون قدرته على التأثير والقيادة. يستمتع بالعمل مع أشخاص يشاركونه الحماس للتغيير الإيجابي",
-      },
-      range10: {
-        team: "القائد",
-        title: "شخصيتك هي",
-        banner: "نتائج اختبار الشخصية",
-        quote:
-          "جريء وخيالي وذو إرادة قوية. يبرز في القيادة وصنع الطرق الجديدة، ويتمتع بالعزم والإصرار على تحقيق الأهداف",
-        spell:
-          "يفضل التعامل الحازم والمباشر. يقدر الأشخاص الذين يظهرون الصراحة والاحترام لقيادته وقراراته. يحب العمل مع أشخاص يتمتعون بالعزم والإصرار على تحقيق الأهداف",
-      },
-    };
+const HeroSubheading = styled.h2`
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: #555;
+  margin-bottom: 2rem;
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+`;
 
-    const currentContent = quotesAndSpells[scoreDetails.category] || {
-      team: "Default team if score doesn't match any range",
-      quote: "Default quote if score doesn't match any range",
-      spell: "Default spell if score doesn't match any range",
-      title: "شخصيتك هي",
-      banner: "نتائج اختبار الشخصية",
-    };
+/* زر التحميل (يعمل كرابط) */
+const EnrollButton = styled(Link)`
+  background: #ff7143;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  font-weight: 600;
 
-    dispatch(setResultText(currentContent));
+  &:hover {
+    opacity: 0.9;
+  }
+`;
 
-    switch (resultPage) {
-      case 0:
-        return (
-          <div>
-            <QuizPara>{currentContent.quote}</QuizPara>
-          </div>
-        );
-      case 1:
-        return (
-          <div>
-            <QuizPara>{currentContent.spell}</QuizPara>
-          </div>
-        );
-      case 2:
-        return (
-          <div>
-            <form onSubmit={handleSignUp}>
-              <LoginSignSubHeader>
-                زودنا بمعلوماتك لإنشاء حساب وسنرسل لك نتائجك المفصلة على ايميلك
-              </LoginSignSubHeader>
-              <LoginSignInput
-                name="email"
-                placeholder="ايميل"
-                onChange={handleChange}
-              />
-              <LoginSignInput
-                type="password"
-                name="password"
-                placeholder="كلمة السر"
-                onChange={handleChange}
-              />
-              <RegistarButton type="submit" onClick={handleSignUp}>
-                {isRegistering ? <LoadingBar /> : "إنشاء حساب"}
-              </RegistarButton>
-            </form>
-          </div>
-        );
-      default:
-        return null;
+/* ======================
+   === Video Player ===
+   ====================== */
+
+const VideoPlayerContainer = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 768px;
+  margin: 2rem auto 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #000;
+  aspect-ratio: 16 / 9;
+`;
+
+const StyledVideo = styled.video`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  outline: none;
+`;
+
+const ThumbnailOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("THUMBNAIL_URL") center center / cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+const BigPlayButton = styled.div`
+  width: 80px;
+  height: 80px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+`;
+
+/* شريط التحكم السفلي */
+const ControlsContainer = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /* نضبط الإتجاه هنا بحيث تكون الأزرار من اليسار لليمين */
+  direction: ltr;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  padding: 8px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+`;
+
+const ProgressBar = styled.input.attrs({ type: "range" })`
+  flex: 1;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+  height: 4px;
+  margin: 0;
+
+  &::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+  }
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 14px;
+    width: 14px;
+    background: #ff7143;
+    border-radius: 50%;
+    margin-top: -5px;
+    border: 2px solid #fff;
+  }
+`;
+
+const TimeLabel = styled.div`
+  color: #fff;
+  font-size: 14px;
+  min-width: 70px;
+  text-align: center;
+`;
+
+const IconButton = styled.button`
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+
+  &:hover {
+    color: #ff7143;
+  }
+`;
+
+const FullscreenButton = styled(IconButton)``;
+
+const VideoPlayer = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+
+  const videoRef = useRef(null);
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
     }
   };
 
-  const getScoreDetails = () => {
-    const totalScore = calculateTotalScore();
-    const maxScorePerQuestion = 7;
-    const maxTotalScore = currentStatements.length * maxScorePerQuestion;
-    let scoreDetails = {
-      svg: null,
-      category: "",
-    };
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
 
-    const scoreRanges = [
-      { limit: maxTotalScore / 10, svg: charact1, category: "range1" },
-      { limit: (maxTotalScore * 2) / 10, svg: charact2, category: "range2" },
-      { limit: (maxTotalScore * 3) / 10, svg: charact3, category: "range3" },
-      { limit: (maxTotalScore * 4) / 10, svg: charact4, category: "range4" },
-      { limit: (maxTotalScore * 5) / 10, svg: charact5, category: "range5" },
-      { limit: (maxTotalScore * 6) / 10, svg: charact6, category: "range6" },
-      { limit: (maxTotalScore * 7) / 10, svg: charact7, category: "range7" },
-      { limit: (maxTotalScore * 8) / 10, svg: charact8, category: "range8" },
-      { limit: (maxTotalScore * 9) / 10, svg: charact9, category: "range9" },
-      { limit: maxTotalScore, svg: charact10, category: "range10" },
-    ];
+  const formatTime = (seconds) => {
+    if (!seconds) return "0:00";
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    if (h > 0) {
+      return `${h}:${m.toString().padStart(2, "0")}:${s
+        .toString()
+        .padStart(2, "0")}`;
+    }
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
 
-    // Find the appropriate score range
-    const matchedRange = scoreRanges.find((range) => totalScore <= range.limit);
-    if (matchedRange) {
-      scoreDetails.svg = matchedRange.svg;
-      scoreDetails.category = matchedRange.category;
+  const handlePlayPause = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
     } else {
-      // Handle the case where the score is above the maximum expected score
-      scoreDetails.svg = charact10; // replace with an actual image reference
-      scoreDetails.category = "aboveRange";
-    }
-
-    return scoreDetails;
-  };
-
-  const handleChange = (e) => {
-    setInputs((prev) => {
-      return { ...prev, [e.target.name]: e.target.value };
-    });
-  };
-
-  const questionRefs = useRef([]);
-  questionRefs.current = [];
-
-  const addToRefs = (el) => {
-    if (el && !questionRefs.current.includes(el)) {
-      questionRefs.current.push(el);
+      videoRef.current.play();
+      setIsPlaying(true);
     }
   };
 
-  const handleNextPage = () => {
-    if (resultPage < 2) {
-      setResultPage((prevPage) => prevPage + 1);
+  const handleThumbnailClick = () => {
+    handlePlayPause();
+  };
+
+  const handleProgressChange = (e) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = e.target.value;
+      setCurrentTime(e.target.value);
+    }
+  };
+
+  const handleMuteClick = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
+
+  const handleFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
     } else {
-    }
-  };
-
-  const getPersonalityType = () => {
-    const scoreCategory = getScoreDetails().category;
-    const personalityTypes = {
-      low: "Type for low score",
-      medium: "Type for medium score",
-      high: "Type for high score",
-      extraHigh: "Type for extra high score",
-    };
-
-    return personalityTypes[scoreCategory];
-  };
-
-  const scoreDetails = getScoreDetails();
-
-  const scoreOptions =
-    screenWidth > 768
-      ? [
-          { size: "45px", borderColor: "#88619a" },
-          { size: "35px", borderColor: "#88619a" },
-          { size: "28px", borderColor: "#88619a" },
-          { size: "25px", borderColor: "#9b9faa" },
-          { size: "28px", borderColor: "#33a474" },
-          { size: "35px", borderColor: "#33a474" },
-          { size: "45px", borderColor: "#33a474" },
-        ]
-      : [
-          // Smaller sizes for screens with max-width: 768px
-          { size: "30px", borderColor: "#88619a" },
-          { size: "25px", borderColor: "#88619a" },
-          { size: "17px", borderColor: "#88619a" },
-          { size: "15px", borderColor: "#9b9faa" },
-          { size: "17px", borderColor: "#33a474" },
-          { size: "25px", borderColor: "#33a474" },
-          { size: "30px", borderColor: "#33a474" },
-        ];
-
-  const handleAnswerSelect = (questionIndex, selectedScore) => {
-    let newAnswers = [...answers];
-    newAnswers[questionIndex] = selectedScore;
-    setAnswers(newAnswers);
-
-    // Proceed to next question or end of current statement set
-    if (questionIndex < currentStatements.length - 1) {
-      setCurrentQuestion(questionIndex + 1);
-    } else {
-      setCurrentQuestion(currentQuestion + 1); // This will trigger the useEffect
-    }
-  };
-
-  const handleSignUp = async (e) => {
-    e.preventDefault();
-    setIsRegistering(true); // Start spinner
-    try {
-      await dispatch(register(inputs)).unwrap();
-      navigate("/outcome"); // Redirect on successful registration
-      setIsRegistering(false); // Stop spinner on success
-    } catch (error) {
-      setIsRegistering(false); // Stop spinner on failure
-      // Handle the error (e.g., setRegistrationError)
-    }
-  };
-
-  useEffect(() => {
-    // Scrolling to the current question
-    if (currentQuestion < questionRefs.current.length) {
-      questionRefs.current[currentQuestion].scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-
-    // Handling window resize
-    const handleResize = () => setScreenWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, [currentQuestion]);
-
-  const statementSets = [
-    statements,
-    statements2,
-    statements3,
-    statements4,
-    statements5,
-  ];
-
-  useEffect(() => {
-    if (currentQuestion >= currentStatements.length) {
-      const currentSetIndex = statementSets.indexOf(currentStatements);
-      const nextSetIndex = currentSetIndex + 1;
-
-      if (nextSetIndex < statementSets.length) {
-        const nextStatements = statementSets[nextSetIndex];
-        setCurrentStatements(nextStatements);
-        setAnswers(Array(nextStatements.length).fill(0));
-        setCurrentQuestion(0);
-      } else {
-        setShowScore(true);
-        setScore(answers.reduce((total, answer) => total + answer, 0));
+      if (videoRef.current?.parentNode?.requestFullscreen) {
+        videoRef.current.parentNode.requestFullscreen();
       }
     }
-
-    if (showScore) {
-      const totalScore = calculateTotalScore();
-      const scoreDetails = getScoreDetails(totalScore);
-      dispatch(setQuizResults({ totalScore, scoreDetails }));
-    }
-  }, [currentQuestion, currentStatements, showScore, statementSets]);
+  };
 
   useEffect(() => {
-    if (showScore) {
-      window.scrollTo(0, 0);
-    }
-  }, [showScore]);
+    if (videoRef.current) {
+      const handlePause = () => setIsPlaying(false);
+      const handleEnded = () => setIsPlaying(false);
 
-  const shareUrl = window.location.href;
-  const shareMessage = "اعرف نوع شخصيتك باختبار قصير يعلمك نقاط قوتك وضعفك";
+      videoRef.current.addEventListener("pause", handlePause);
+      videoRef.current.addEventListener("ended", handleEnded);
+
+      return () => {
+        videoRef.current.removeEventListener("pause", handlePause);
+        videoRef.current.removeEventListener("ended", handleEnded);
+      };
+    }
+  }, []);
 
   return (
-    <>
-      {showScore ? (
-        <div>
-          <ResCon>
-            <ResBox>
-              <ResBor>
-                <ResHr />
-                <ResCar>
-                  <ResFie>
-                    <ResAll>
-                      <ResTop></ResTop>
-                      <ResTit>نوع شخصيتك هو</ResTit>
-                      <ResSubTit>{getPersonalityType()}</ResSubTit>
-                      <ResTyCon>
-                        <ResTySp></ResTySp>
-                        {currentTeam ? (
-                          <QuizHe>{currentTeam}</QuizHe>
-                        ) : (
-                          <StyledSpinner />
-                        )}
-                      </ResTyCon>
-                      <ResMid>
-                        <ResImg src={scoreDetails.svg} alt="score indicator" />
-                        <br />
+    <VideoPlayerContainer>
+      <StyledVideo
+        ref={videoRef}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        muted={isMuted}
+      >
+        <source
+          src="https://alsallum.s3.eu-north-1.amazonaws.com/fluentfox_ad.mp4"
+          type="video/mp4"
+        />
+        متصفحك لا يدعم تشغيل الفيديو.
+      </StyledVideo>
 
-                        <ProgressCon>
-                          <ProgressCal
-                            value={calculateTotalScore()}
-                            max={statements.length * 7}
-                          />
-                        </ProgressCon>
-                      </ResMid>
-                      <ResBot>{renderResultContent()}</ResBot>
-                    </ResAll>
-                    <ResOp>
-                      <ResRoof>
-                        {[...Array(3)].map((_, index) => (
-                          <ResDot
-                            key={index}
-                            onClick={() => setResultPage(index)}
-                            style={{
-                              backgroundColor:
-                                resultPage === index ? "#886199" : "#ccc",
-                              cursor: "pointer",
-                            }}
-                          />
-                        ))}
-                      </ResRoof>
-
-                      <ResOpBut onClick={handleNextPage}>التالي</ResOpBut>
-                    </ResOp>
-                  </ResFie>
-                </ResCar>
-              </ResBor>
-            </ResBox>
-          </ResCon>
-          <Social />
-        </div>
-      ) : (
-        <div>
-          <IntroBod>
-            <IntroText>اختبار مجاني لتحديد الشخصية</IntroText>
-            <Intro>من نوع نوريس®</Intro>
-          </IntroBod>
-          <OpCon>
-            <OpMain>
-              <OpImg
-                src="https://www.16personalities.com/static/images/test-header-2.svg"
-                alt=""
-              />
-              <OpText>
-                <OpSubText>
-                  اكتشف المزيد عن نفسك من خلال اختبار الشخصية. بيساعدك في فهم
-                  نقاط القوة والضعف لديك، وكيفية التفاعل مع الآخرين، وفي اتخاذ
-                  قرارات أفضل في حياتك المهنية والشخصية.
-                </OpSubText>
-              </OpText>
-            </OpMain>
-            <OpMain>
-              <OpImg
-                src="https://www.16personalities.com/static/images/academy/explorers/icons/theory.svg"
-                alt=""
-              />
-              <OpText>
-                <OpSubText>
-                  اكتشف كيف يمكن لنمط شخصيتك أن يؤثر في عدة مجالات من حياتك، من
-                  العلاقات الاجتماعية وحتى الخيارات المهنية.
-                </OpSubText>
-              </OpText>
-            </OpMain>
-            <OpMain>
-              <OpImg
-                src="https://www.16personalities.com/static/images/academy/analysts/exercise.svg"
-                alt=""
-              />
-              <OpText>
-                <OpSubText>
-                  تنمية شخصيتك وتطورك نحو أن تصبح الشخص الذي تحلم به يصبح أكثر
-                  سهولة وفعالية مع باقتنا الفاخرة من الخدمات الإضافية المتاحة
-                  لك.
-                </OpSubText>
-              </OpText>
-            </OpMain>
-          </OpCon>
-          <QuizBody>
-            <QuizCon>
-              {currentStatements.map((statement, index) => (
-                <QuizFieldset
-                  key={statement.id}
-                  ref={addToRefs}
-                  $current={index === currentQuestion}
-                >
-                  <FieldDiv>
-                    <QueSpa>{statement.text}</QueSpa>
-                  </FieldDiv>
-                  <QuizDiv>
-                    <ScoreSection>لااتفق</ScoreSection>
-                    <ScoreSectionProgress>
-                      {scoreOptions.map((option, optionIndex) => (
-                        <ScoreSectionbackground
-                          key={optionIndex}
-                          $borderColor={option.borderColor}
-                        >
-                          <QuestionSection>
-                            <QuestionCount
-                              type="radio"
-                              name={`question_${index}`}
-                              onChange={() =>
-                                handleAnswerSelect(index, optionIndex + 1)
-                              }
-                              checked={answers[index] === optionIndex + 1}
-                            />
-                            <QuestionCountSpan
-                              size={option.size}
-                              $borderColor={option.borderColor}
-                              $selected={answers[index] === optionIndex + 1}
-                            ></QuestionCountSpan>
-                          </QuestionSection>
-                        </ScoreSectionbackground>
-                      ))}
-                    </ScoreSectionProgress>
-                    <ScoreSectioTwo>اتفق</ScoreSectioTwo>
-                  </QuizDiv>
-                </QuizFieldset>
-              ))}
-            </QuizCon>
-          </QuizBody>
-        </div>
+      {/* Overlay thumbnail with big play button (only before first playback) */}
+      {!isPlaying && currentTime === 0 && (
+        <ThumbnailOverlay onClick={handleThumbnailClick}>
+          <BigPlayButton>▶</BigPlayButton>
+        </ThumbnailOverlay>
       )}
-      <AnswerSection>
-        <QuestionBut>التالي</QuestionBut>
-      </AnswerSection>
-      <ShareCon>
-        <ShareTit>1.3M</ShareTit>
-        <ShareTit>اضغط للمشاركة</ShareTit>
-      </ShareCon>
-      <ShareIcon>
-        <TwitterShareButton
-          url={shareUrl}
-          title="Check out my personality quiz results!"
-          hashtags={["PersonalityTest", "Quiz"]}
+
+      {/* Bottom control bar */}
+      <ControlsContainer>
+        {/* Play/Pause on the far left */}
+        <IconButton onClick={handlePlayPause}>
+          {isPlaying ? "⏸" : "▶"}
+        </IconButton>
+
+        {/* Progress bar in the middle (flex: 1) */}
+        <ProgressBar
+          min="0"
+          max={duration}
+          step="0.1"
+          value={currentTime}
+          onChange={handleProgressChange}
+        />
+
+        {/* Group the time, mute, fullscreen on the far right */}
+        <div
+          style={{
+            marginLeft: "auto",
+            display: "flex",
+            gap: "8px",
+            alignItems: "center",
+          }}
         >
-          <TwitterIcon size={32} round />
-        </TwitterShareButton>
-        <FacebookShareButton
-          url={shareUrl}
-          quote="Check out my personality quiz results!"
-          hashtag="#PersonalityTest"
-        >
-          <FacebookIcon size={32} round />
-        </FacebookShareButton>
-        <WhatsappShareButton
-          url={shareUrl}
-          title={shareMessage}
-          separator=":: "
-        >
-          <WhatsappIcon size={32} round />
-        </WhatsappShareButton>
-      </ShareIcon>
-    </>
+          <TimeLabel>
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </TimeLabel>
+
+          <IconButton onClick={handleMuteClick}>
+            {isMuted ? "🔇" : "🔊"}
+          </IconButton>
+
+          <FullscreenButton onClick={handleFullscreen}>⛶</FullscreenButton>
+        </div>
+      </ControlsContainer>
+    </VideoPlayerContainer>
+  );
+};
+
+/* ======================
+   === القسم التعريفي للتطبيق باللغة العربية ===
+   ====================== */
+const Personality = () => {
+  return (
+    <ContainerAll>
+      <NavTech />
+
+      <HeroSection>
+        <HeroHeading>تعلم الإنجليزية بطريقة مبتكرة وتفاعلية!</HeroHeading>
+        <HeroSubheading>
+          انضم إلى آلاف المتعلمين الذين اكتشفوا أن تعلم اللغة الإنجليزية ليس
+          مجرد دراسة، بل هو رحلة ممتعة تحول التحديات إلى فرص للتطور والنمو. مع
+          تطبيقنا، ستحصل على دروس تفاعلية ومحتوى فريد يساعدك على تجاوز الحواجز
+          وتحقيق التميز في اللغة. سواء كنت مبتدئًا أو تسعى لتطوير مهاراتك، فإن
+          كل خطوة في هذا التطبيق ستفتح لك آفاقًا جديدة وتدفعك نحو مستقبل مشرق.
+        </HeroSubheading>
+
+        <EnrollButton to="https://apps.apple.com/sa/app/fluentfox-language-lessons/id6673901781">
+          حمل التطبيق الآن وابدأ مغامرتك اللغوية!
+        </EnrollButton>
+
+        <VideoPlayer />
+      </HeroSection>
+    </ContainerAll>
   );
 };
 
