@@ -1,15 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  Article,
-  Divider,
-  Footer,
-  Last,
-  Main,
-  NavTech,
-  Options,
-  Sections,
-  Very,
-} from "../components";
+import { Article, Footer, Last, Very } from "../components";
 
 const Home = () => {
   useEffect(() => {

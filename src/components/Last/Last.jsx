@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // Import icon images from assets
 import laptopIcon from "../../assets/laptop.png";
@@ -31,12 +32,16 @@ const Grid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 `;
 
-const StyledCard = styled.div`
+// Create a styled Link that behaves like a card
+const CardLink = styled(Link)`
   background-color: #f8f6f2;
   border-radius: 8px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, background-color 0.3s ease;
   cursor: pointer;
+  text-decoration: none;
+  display: block;
+  color: inherit;
 
   &:hover {
     transform: scale(1.05);
@@ -70,19 +75,14 @@ const CardDescription = styled.p`
   text-align: right;
 `;
 
-const ActionLink = styled.a`
+const ActionText = styled.div`
   display: inline-flex;
   flex-direction: row-reverse;
   align-items: center;
   gap: 0.5rem;
   color: #1a202c;
-  text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease-in-out;
-
-  &:hover {
-    color: #4a5568;
-  }
 `;
 
 const getIcon = (icon) => {
@@ -116,20 +116,20 @@ const Last = () => {
       title: "أنشئ قناة يوتيوب",
       description: "تعلم كيف تبدأ قناة يوتيوب بناءً على سنوات خبرتي.",
       icon: "laptop",
-      href: "/youtube",
+      href: "/main/رحلة النجاح على يوتيوب: خطوات لصناعة قناة ناجحة",
     },
     {
       title: "كن أكثر إنتاجية",
       description:
         "تعلم كيف تنفذ بكفاءة، وتوفر وقتك للأشياء المهمة وتستمتع في العملية.",
       icon: "gears",
-      href: "/productivity",
+      href: "/main/إنتاجية%20عالية:%20مفتاح%20النجاح%20والتوازن%20في%20الحياة",
     },
     {
       title: "أنشئ دخلًا عبر الإنترنت",
       description: "تعلم استراتيجيات لإنشاء مصادر دخل عبر الإنترنت مستدامة.",
       icon: "money",
-      href: "/income",
+      href: "/main/طرق%20جني%20الأموال%20عبر%20الإنترنت:%20استراتيجيات%20لتحقيق%20الدخل%20الرقمي",
     },
   ];
 
@@ -138,17 +138,17 @@ const Last = () => {
       <Heading>كيف يمكنني مساعدتك؟</Heading>
       <Grid>
         {cards.map((card, index) => (
-          <StyledCard key={index}>
+          <CardLink key={index} to={card.href}>
             <CardContent>
               {getIcon(card.icon)}
               <CardTitle>{card.title}</CardTitle>
               <CardDescription>{card.description}</CardDescription>
-              <ActionLink href={card.href}>
+              <ActionText>
                 <span>ابدأ الآن</span>
                 <ArrowRight size={16} style={{ transform: "scaleX(-1)" }} />
-              </ActionLink>
+              </ActionText>
             </CardContent>
-          </StyledCard>
+          </CardLink>
         ))}
       </Grid>
     </Container>

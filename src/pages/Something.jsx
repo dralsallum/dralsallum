@@ -1,10 +1,14 @@
-import { NavTech, Resume } from "../components";
+import React, { useEffect } from "react";
+import { Footer, NavTech, Resume } from "../components";
 
 const Something = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
-      <NavTech />
       <Resume />
+      <Footer />
     </>
   );
 };
