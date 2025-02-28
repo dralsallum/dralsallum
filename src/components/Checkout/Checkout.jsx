@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { removeProduct, clearCart } from "../../redux/cartRedux";
 import Cross from "../../assets/crossFirst.png";
 import { publicRequest } from "../../requestMethods";
+import { Link } from "react-router-dom";
 
 /* Styled components remain the same */
 const PageContainer = styled.div`
@@ -497,7 +498,7 @@ const Checkout = () => {
                   checked={termsAccepted}
                   onChange={() => setTermsAccepted(!termsAccepted)}
                 />
-                لقد قرأت وأوافق على <a href="#">الشروط والأحكام</a>
+                لقد قرأت وأوافق على <Link to="/policy">الشروط والأحكام</Link>
               </label>
             </TermsCheckbox>
 

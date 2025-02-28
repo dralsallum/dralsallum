@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import logo from "../../assets/drslallum.png";
 
-/* ====== المكونات المُنسقة لشريط التنقل ====== */
+/* ====== Styled Components for Navigation Bar ====== */
 const Header = styled.header`
   display: flex;
   flex-direction: row-reverse;
@@ -18,17 +18,15 @@ const Header = styled.header`
   }
 `;
 
-/* جعل الشعار عنصر Link للتنقل إلى الصفحة الرئيسية */
 const Logo = styled(Link)`
   display: flex;
   align-items: center;
   font-size: 1.5rem;
   font-weight: bold;
   color: #000;
-  text-decoration: none; /* إزالة التسطير من الرابط */
+  text-decoration: none;
 `;
 
-// مكون مُنسق لصورة الشعار
 const LogoImage = styled.img`
   width: 200px;
   height: auto;
@@ -44,11 +42,12 @@ const NavLinks = styled.nav`
   gap: 1.5rem;
 
   @media (max-width: 768px) {
-    display: none; /* إخفاؤها على الجوال (سيتم استخدام زر القائمة) */
+    display: none; /* Hidden on mobile */
   }
 `;
 
-const NavLink = styled.a`
+/* NavLink for desktop navigation using react-router-dom Link */
+const NavLinkStyled = styled(Link)`
   text-decoration: none;
   color: #000;
   font-weight: 500;
@@ -68,7 +67,7 @@ const SubscribeButton = styled.button`
   font-size: 0.9rem;
 
   @media (max-width: 768px) {
-    display: none; /* إخفاؤها على الجوال */
+    display: none; /* Hidden on mobile */
   }
 `;
 
@@ -95,7 +94,7 @@ const MobileMenuContainer = styled.div`
     display: block;
     background: #fff;
     position: absolute;
-    top: 70px; /* تعديل وفقًا لارتفاع الهيدر */
+    top: 70px; /* Adjust as needed */
     right: 1rem;
     left: 1rem;
     z-index: 999;
@@ -113,15 +112,16 @@ const MobileMenuList = styled.ul`
 
 const MobileMenuItem = styled.li`
   margin: 0.5rem 0;
+`;
 
-  a {
-    text-decoration: none;
-    color: #333;
-    font-size: 1.1rem;
-    font-weight: 500;
-    &:hover {
-      text-decoration: underline;
-    }
+/* MobileMenuLink mirrors the desktop NavLinkStyled */
+const MobileMenuLink = styled(Link)`
+  text-decoration: none;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 500;
+  &:hover {
+    text-decoration: underline;
   }
 `;
 
@@ -135,43 +135,47 @@ const NavTech = () => {
   return (
     <>
       <Header>
-        {/* الشعار مغلف الآن بعنصر Link */}
         <Logo to="/">
           <LogoImage src={logo} alt="شعار درس السلوم" />
         </Logo>
 
-        {/* قائمة التنقل لسطح المكتب */}
         <NavLinks>
-          <NavLink href="#">كتابي</NavLink>
-          <NavLink href="#">موارد مجانية</NavLink>
-          <NavLink href="#">أكاديمية يوتيوب</NavLink>
-          <NavLink href="#">مختبر الإنتاجية</NavLink>
-          <NavLink href="#">لايف أو إس</NavLink>
+          <NavLinkStyled to="/job">تطبيق الانجليزي</NavLinkStyled>
+          <NavLinkStyled to="/audio">بودكاست</NavLinkStyled>
+          <NavLinkStyled to="/personality">أكاديمية التعلم</NavLinkStyled>
+          <NavLinkStyled to="/main/طرق%20جني%20الأموال%20عبر%20الإنترنت:%20استراتيجيات%20لتحقيق%20الدخل%20الرقمي">
+            دخل الانترنت
+          </NavLinkStyled>
+          <NavLinkStyled to="/main/إنتاجية%20عالية:%20مفتاح%20النجاح%20والتوازن%20في%20الحياة">
+            الانتاجية
+          </NavLinkStyled>
         </NavLinks>
 
-        {/* زر الاشتراك وتبديل القائمة للجوال */}
         <SubscribeButton>انضم إلى أكثر من 260 ألف مشترك</SubscribeButton>
         <MenuButton onClick={toggleMenu}>☰</MenuButton>
       </Header>
 
-      {/* قائمة الهاتف (تظهر بناءً على الشرط) */}
       {isMenuOpen && (
         <MobileMenuContainer>
           <MobileMenuList>
             <MobileMenuItem>
-              <a href="#">كتابي</a>
+              <MobileMenuLink to="/job">تطبيق الانجليزي</MobileMenuLink>
             </MobileMenuItem>
             <MobileMenuItem>
-              <a href="#">موارد مجانية</a>
+              <MobileMenuLink to="/audio">بودكاست</MobileMenuLink>
             </MobileMenuItem>
             <MobileMenuItem>
-              <a href="#">أكاديمية يوتيوب</a>
+              <MobileMenuLink to="/personality">أكاديمية التعلم</MobileMenuLink>
             </MobileMenuItem>
             <MobileMenuItem>
-              <a href="#">مختبر الإنتاجية</a>
+              <MobileMenuLink to="/main/طرق%20جني%20الأموال%20عبر%20الإنترنت:%20استراتيجيات%20لتحقيق%20الدخل%20الرقمي">
+                دخل الانترنت
+              </MobileMenuLink>
             </MobileMenuItem>
             <MobileMenuItem>
-              <a href="#">لايف أو إس</a>
+              <MobileMenuLink to="/main/إنتاجية%20عالية:%20مفتاح%20النجاح%20والتوازن%20في%20الحياة">
+                الانتاجية
+              </MobileMenuLink>
             </MobileMenuItem>
           </MobileMenuList>
         </MobileMenuContainer>

@@ -46,10 +46,16 @@ const HeroSubheading = styled.h2`
   font-size: 1.25rem;
   font-weight: 400;
   color: #555;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   @media (max-width: 768px) {
     font-size: 1.1rem;
   }
+`;
+
+const AdditionalText = styled.p`
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
 `;
 
 const EnrollButton = styled.button`
@@ -127,7 +133,6 @@ const ControlsContainer = styled.div`
   bottom: 0;
   left: 0;
   width: 100%;
-  /* نضبط الإتجاه هنا بحيث تكون الأزرار من اليسار لليمين */
   direction: ltr;
   background: linear-gradient(
     to top,
@@ -269,7 +274,6 @@ const VideoPlayer = () => {
       videoElement.addEventListener("ended", handleEnded);
 
       return () => {
-        // Use the captured reference to remove the listeners
         videoElement.removeEventListener("pause", handlePause);
         videoElement.removeEventListener("ended", handleEnded);
       };
@@ -300,12 +304,10 @@ const VideoPlayer = () => {
 
       {/* Bottom control bar */}
       <ControlsContainer>
-        {/* Play/Pause on the far left */}
         <IconButton onClick={handlePlayPause}>
           {isPlaying ? "⏸" : "▶"}
         </IconButton>
 
-        {/* Progress bar in the middle (flex: 1) */}
         <ProgressBar
           min="0"
           max={duration}
@@ -314,7 +316,6 @@ const VideoPlayer = () => {
           onChange={handleProgressChange}
         />
 
-        {/* Group the time, mute, fullscreen on the far right */}
         <div
           style={{
             marginLeft: "auto",
@@ -339,7 +340,7 @@ const VideoPlayer = () => {
 };
 
 /* ======================
-   === Career Section ===
+   === Academic Section ===
    ====================== */
 const Career = () => {
   const dispatch = useDispatch();
@@ -348,8 +349,8 @@ const Career = () => {
   const handleEnroll = () => {
     const product = {
       _id: "PTYA001",
-      title: "أكاديمية اليوتيوبر بدوام جزئي",
-      price: 995,
+      title: "أكاديمية التفوق الدراسي",
+      price: 249,
       quantity: 1,
     };
     dispatch(addProduct(product));
@@ -361,14 +362,18 @@ const Career = () => {
       <NavTech />
 
       <HeroSection>
-        <HeroHeading>انضم إلى أكاديمية اليوتيوبر بدوام جزئي</HeroHeading>
+        <HeroHeading>انطلق نحو مستقبل أكاديمي مشرق</HeroHeading>
         <HeroSubheading>
-          اكتشف الاستراتيجيات والتقنيات المثبتة لتحقيق النجاح على يوتيوب — دون
-          التخلي عن عملك اليومي
+          استكشف أساليب الدراسة الذكية والتقنيات التعليمية المبتكرة لتحقيق تفوقك
+          الدراسي وتطوير مهاراتك الأكاديمية. انضم إلى برنامجنا المتكامل واستعد
+          لتحويل تجربتك التعليمية إلى رحلة مليئة بالإبداع والنجاح.
         </HeroSubheading>
-
+        <AdditionalText>
+          تعلم كيف تدمج بين النظرية والتطبيق، وتبنّى أساليب دراسة جديدة تجعل من
+          كل يوم فرصة للتعلم والنمو الشخصي.
+        </AdditionalText>
         <EnrollButton onClick={handleEnroll}>
-          سجل الآن مقابل 995 دولار
+          سجل الآن مقابل 249 ريال
         </EnrollButton>
 
         <VideoPlayer />
