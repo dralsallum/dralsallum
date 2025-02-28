@@ -70,13 +70,6 @@ const ErrorMessage = styled.p`
   margin-bottom: -1rem;
 `;
 
-const SuccessMessage = styled.p`
-  color: green;
-  font-weight: 500;
-  margin-top: 1rem;
-  margin-bottom: -1rem;
-`;
-
 const CheckoutContent = styled.div`
   display: flex;
   align-items: flex-start;
@@ -336,7 +329,6 @@ const Checkout = () => {
   const [street, setStreet] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(""); // "uploading" or "processing"
 
@@ -395,8 +387,7 @@ const Checkout = () => {
       // Submit order information
       const orderResponse = await publicRequest.post("/orders", orderData);
       if (orderResponse.data) {
-        setSuccessMessage("تم إرسال طلبك بنجاح!");
-        // Do not clear cart immediately; we'll clear it after successful payment redirection.
+        // Success message removed as requested.
       }
     } catch (error) {
       console.error("Error submitting order:", error);
@@ -409,7 +400,7 @@ const Checkout = () => {
     setCurrentStep("processing");
     try {
       const payload = {
-        amount: orderTotal, // use the stored total instead of cart.total
+        amount: orderTotal,
         currency: "SAR",
         items: orderProducts.map((product) => ({
           name: product.title,
@@ -447,7 +438,6 @@ const Checkout = () => {
         </TitleRow>
 
         {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-        {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
 
         <CheckoutContent>
           <OrderSummary>
@@ -457,7 +447,6 @@ const Checkout = () => {
                 سلة التسوق فارغة. أضف منتجات لعرضها هنا.
               </p>
             ) : (
-              ((orderProducts) => (orderProducts = cart.products),
               cart.products.map((product) => (
                 <SummaryItem key={product._id}>
                   <div>
@@ -473,7 +462,7 @@ const Checkout = () => {
                     onClick={() => handleRemove(product._id)}
                   />
                 </SummaryItem>
-              )))
+              ))
             )}
 
             <CouponWrapper>
@@ -548,11 +537,12 @@ const Checkout = () => {
                   <option value="المملكة العربية السعودية">
                     المملكة العربية السعودية
                   </option>
-                  <option value="المملكة المتحدة">المملكة المتحدة</option>
-                  <option value="الولايات المتحدة">الولايات المتحدة</option>
-                  <option value="كندا">كندا</option>
-                  <option value="أستراليا">أستراليا</option>
-                  <option value="دولة أخرى">دولة أخرى</option>
+                  <option value="الإمارات العربية المتحدة">
+                    الإمارات العربية المتحدة
+                  </option>
+                  <option value="قطر">قطر</option>
+                  <option value="البحرين">البحرين</option>
+                  <option value="الكويت">الكويت</option>
                 </select>
               </FormField>
               <FormField>
