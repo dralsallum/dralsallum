@@ -2,6 +2,7 @@ import axios from "axios";
 
 const BASE_URL = "https://dralsallumapi-8efe1bd8f8df.herokuapp.com/api";
 
+// Retrieve token from localStorage if needed
 const user = JSON.parse(localStorage.getItem("persist:root"))?.user;
 const currentUser = user && JSON.parse(user).currentUser;
 const TOKEN = currentUser?.accessToken;
@@ -12,5 +13,5 @@ export const publicRequest = axios.create({
 
 export const userRequest = axios.create({
   baseURL: BASE_URL,
-  header: { token: `Bearer ${TOKEN}` },
+  headers: { token: `Bearer ${TOKEN}` },
 });

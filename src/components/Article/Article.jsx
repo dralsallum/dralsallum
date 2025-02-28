@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import Example from "../../assets/bookAli.webp";
+import Example from "../../assets/iphone-menu.png";
 import Example2 from "../../assets/productivity_lab.png";
 import Example3 from "../../assets/youtuber_academy.png";
 
@@ -123,24 +123,25 @@ const ProductCard = ({ title, description, image, link }) => (
 const ProductCards = () => {
   const products = [
     {
-      title: "إنتاجية تبعث على الشعور بالراحة",
+      title: "أكاديمية الدراسة",
       description:
-        "كتابي الأكثر مبيعاً في نيويورك تايمز عن كيفية القيام بالمزيد مما يهمك، مع الاستمتاع بالرحلة في نفس الوقت.",
+        "دورة تساعد الطلاب على تحسين أساليب الدراسة وتنمية مهارات التعلم الفعّالة لتحقيق النجاح الأكاديمي.",
+      image: Example3,
+      link: "/job",
+    },
+    {
+      title: "تطبيق لتعليم الإنجليزي",
+      description:
+        "استكشف أسلوباً مبتكراً لتعلم اللغة الإنجليزية عبر تطبيق فلونت فوكس، الذي يجمع بين التقنيات الحديثة والتفاعل العملي لجعل التعلم ممتعاً وفعّالاً.",
       image: Example,
       link: "/personality",
     },
     {
-      title: "مختبر الإنتاجية",
+      title: "بودكاست تعلم الإنجليزية عبر القصص",
       description:
-        "مجتمعي لرواد الأعمال والطموحين من المبدعين والمحترفين. نساعدك على مضاعفة إنتاجيتك أثناء الاستمتاع وصنع الصداقات.",
+        "استمع إلى قصص مشوّقة تُثري مهاراتك اللغوية مع فلونت فوكس بودكاست، حيث يتحول التعلم إلى رحلة مسلية وممتعة.",
       image: Example2,
-      link: "#",
-    },
-    {
-      title: "أكاديمية اليوتيوبرز",
-      description: "دوراتي وبرامجي حول كيفية تنمية قناة يوتيوب تغير الحياة.",
-      image: Example3,
-      link: "/job",
+      link: "/audio",
     },
   ];
 

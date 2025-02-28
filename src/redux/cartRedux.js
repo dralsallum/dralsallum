@@ -4,55 +4,115 @@ const cartSlice = createSlice({
   name: "cart",
   initialState: {
     products: [],
-    quantity: 0, // total count of all items
-    total: 0, // total price
+    quantity: 0,
+    total: 0,
+    loading: false,
+    error: null,
   },
   reducers: {
+    // Add product to cart
     addProduct: (state, action) => {
-      // Check if product is already in cart
-      const existingItemIndex = state.products.findIndex(
-        (item) => item._id === action.payload._id
+      const productToAdd = action.payload;
+      const existingProductIndex = state.products.findIndex(
+        (p) => p._id === productToAdd._id
       );
 
-      if (existingItemIndex !== -1) {
-        // If already in cart, increment the quantity
-        state.products[existingItemIndex].quantity += action.payload.quantity;
+      if (existingProductIndex >= 0) {
+        // Update existing product quantity
+        state.products[existingProductIndex].quantity += productToAdd.quantity;
+        state.total += productToAdd.price * productToAdd.quantity;
       } else {
-        // Otherwise, push a new product
-        state.products.push(action.payload);
+        // Add new product to cart
+        state.quantity += 1;
+        state.products.push(productToAdd);
+        state.total += productToAdd.price * productToAdd.quantity;
       }
-
-      // Increase overall cart quantity and total
-      state.quantity += action.payload.quantity;
-      state.total += action.payload.price * action.payload.quantity;
     },
 
+    // Remove product from cart
     removeProduct: (state, action) => {
-      const productId = action.payload;
-      // Find the product in the cart by ID
-      const existingItemIndex = state.products.findIndex(
-        (item) => item._id === productId
+      const productIdToRemove = action.payload;
+      const productToRemove = state.products.find(
+        (p) => p._id === productIdToRemove
       );
 
-      if (existingItemIndex !== -1) {
-        const existingItem = state.products[existingItemIndex];
-
-        // Decrement the overall cart quantity by 1
+      if (productToRemove) {
         state.quantity -= 1;
-        // Subtract the price of a single unit
-        state.total -= existingItem.price;
+        state.total -= productToRemove.price * productToRemove.quantity;
+        state.products = state.products.filter(
+          (p) => p._id !== productIdToRemove
+        );
+      }
+    },
 
-        // If the product's quantity is more than 1, just decrement the quantity
-        if (existingItem.quantity > 1) {
-          existingItem.quantity -= 1;
+    // Decrease product quantity by one
+    decreaseProductQuantity: (state, action) => {
+      const productId = action.payload;
+      const productIndex = state.products.findIndex((p) => p._id === productId);
+
+      if (productIndex >= 0) {
+        if (state.products[productIndex].quantity > 1) {
+          // Decrease quantity by 1
+          state.products[productIndex].quantity -= 1;
+          state.total -= state.products[productIndex].price;
         } else {
-          // Otherwise, remove the product completely
-          state.products.splice(existingItemIndex, 1);
+          // If quantity is 1, remove the product
+          state.quantity -= 1;
+          state.total -= state.products[productIndex].price;
+          state.products = state.products.filter((p) => p._id !== productId);
         }
       }
+    },
+
+    // Update product quantity
+    updateProductQuantity: (state, action) => {
+      const { productId, quantity } = action.payload;
+      const productIndex = state.products.findIndex((p) => p._id === productId);
+
+      if (productIndex >= 0 && quantity > 0) {
+        const oldQuantity = state.products[productIndex].quantity;
+        const priceDifference =
+          state.products[productIndex].price * (quantity - oldQuantity);
+
+        state.products[productIndex].quantity = quantity;
+        state.total += priceDifference;
+      }
+    },
+
+    // Clear cart
+    clearCart: (state) => {
+      state.products = [];
+      state.quantity = 0;
+      state.total = 0;
+    },
+
+    // Payment loading states
+    paymentStart: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+
+    paymentSuccess: (state) => {
+      state.loading = false;
+      state.error = null;
+    },
+
+    paymentFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
     },
   },
 });
 
-export const { addProduct, removeProduct } = cartSlice.actions;
+export const {
+  addProduct,
+  removeProduct,
+  decreaseProductQuantity,
+  updateProductQuantity,
+  clearCart,
+  paymentStart,
+  paymentSuccess,
+  paymentFailure,
+} = cartSlice.actions;
+
 export default cartSlice.reducer;

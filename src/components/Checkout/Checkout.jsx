@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
-import { removeProduct } from "../../redux/cartRedux"; // <-- adjust path if needed
+import { removeProduct, clearCart } from "../../redux/cartRedux";
 import Cross from "../../assets/crossFirst.png";
+import { publicRequest } from "../../requestMethods";
 
-/* Outer page container */
+/* Styled components remain the same */
 const PageContainer = styled.div`
   background: #edf4f7;
   margin: 20px 30px;
@@ -12,7 +13,8 @@ const PageContainer = styled.div`
   border-radius: 16px;
   overflow: hidden;
   position: relative;
-
+  direction: rtl;
+  text-align: right;
   @media (max-width: 768px) {
     margin: 10px;
     padding: 8px;
@@ -23,7 +25,6 @@ const CheckoutWrapper = styled.div`
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1rem;
-
   @media (max-width: 768px) {
     margin: 1rem auto;
     padding: 0 0.5rem;
@@ -43,7 +44,6 @@ const CheckoutTitle = styled.h1`
   font-weight: 700;
   margin: 0;
   color: #333;
-
   @media (max-width: 768px) {
     font-size: 1.8rem;
   }
@@ -62,12 +62,25 @@ const LoginPrompt = styled.p`
   }
 `;
 
+const ErrorMessage = styled.p`
+  color: red;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: -1rem;
+`;
+
+const SuccessMessage = styled.p`
+  color: green;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: -1rem;
+`;
+
 const CheckoutContent = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   margin-top: 2rem;
-
   @media (max-width: 768px) {
     flex-direction: column;
     margin-top: 1.5rem;
@@ -76,12 +89,12 @@ const CheckoutContent = styled.div`
 
 const BillingColumn = styled.div`
   flex: 3;
-  margin-left: 2rem;
-
+  margin-right: 2rem;
   @media (max-width: 768px) {
-    margin-left: 0;
+    margin-right: 0;
     margin-bottom: 1.5rem;
-    order: 2; /* Show after OrderSummary on mobile */
+    order: 2;
+    width: 100%;
   }
 `;
 
@@ -90,7 +103,6 @@ const BillingInfo = styled.div`
   border-radius: 8px;
   padding: 2rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-
   @media (max-width: 768px) {
     padding: 1rem;
   }
@@ -100,7 +112,6 @@ const BillingTitle = styled.h2`
   font-size: 1.25rem;
   margin-bottom: 1.5rem;
   color: #333;
-
   @media (max-width: 768px) {
     font-size: 1.1rem;
     margin-bottom: 1rem;
@@ -109,22 +120,18 @@ const BillingTitle = styled.h2`
 
 const FormField = styled.div`
   margin-bottom: 1.5rem;
-
   @media (max-width: 768px) {
     margin-bottom: 1rem;
   }
-
   label {
     display: block;
     font-weight: 500;
     margin-bottom: 0.5rem;
     color: #444;
-
     @media (max-width: 768px) {
       font-size: 0.95rem;
     }
   }
-
   input,
   select {
     width: 100%;
@@ -133,108 +140,6 @@ const FormField = styled.div`
     padding: 0.75rem;
     font-size: 1rem;
     color: #333;
-
-    @media (max-width: 768px) {
-      font-size: 0.95rem;
-      padding: 0.65rem;
-    }
-  }
-`;
-
-const PaymentInfo = styled.div`
-  background: #fff;
-  border-radius: 8px;
-  margin-top: 2rem;
-  padding: 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-
-  @media (max-width: 768px) {
-    margin-top: 1rem;
-    padding: 1rem;
-  }
-`;
-
-const PaymentTitle = styled.h2`
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-
-  @media (max-width: 768px) {
-    font-size: 1.1rem;
-  }
-`;
-
-const PaymentParagraph = styled.p`
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 1rem;
-
-  @media (max-width: 768px) {
-    font-size: 0.85rem;
-  }
-`;
-
-const RadioGroup = styled.div`
-  margin-bottom: 1rem;
-`;
-
-const RadioOption = styled.label`
-  display: flex;
-  align-items: center;
-  font-size: 1rem;
-  color: #333;
-  cursor: pointer;
-
-  @media (max-width: 768px) {
-    font-size: 0.95rem;
-  }
-
-  input {
-    margin-right: 0.5rem;
-  }
-`;
-
-const CardIcons = styled.div`
-  margin-left: 1rem;
-  img {
-    height: 20px;
-    margin-right: 0.25rem;
-  }
-`;
-
-const CardFieldRow = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-`;
-
-const PaymentField = styled.div`
-  flex: 1;
-
-  label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: #444;
-
-    @media (max-width: 768px) {
-      font-size: 0.95rem;
-    }
-  }
-
-  input {
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 0.75rem;
-    font-size: 1rem;
-    color: #333;
-
     @media (max-width: 768px) {
       font-size: 0.95rem;
       padding: 0.65rem;
@@ -244,23 +149,20 @@ const PaymentField = styled.div`
 
 const TermsCheckbox = styled.div`
   margin-top: 1rem;
-
   label {
     display: flex;
     align-items: center;
     font-size: 0.95rem;
     color: #333;
     cursor: pointer;
-
     input {
-      margin-right: 0.5rem;
+      margin-left: 0.5rem;
+      margin-right: 0;
     }
-
     @media (max-width: 768px) {
       font-size: 0.9rem;
     }
   }
-
   a {
     color: #ff7143;
     text-decoration: none;
@@ -270,35 +172,12 @@ const TermsCheckbox = styled.div`
   }
 `;
 
-const BuyNowButton = styled.button`
-  margin-top: 2rem;
-  background: #ff7143;
-  color: #fff;
-  border: none;
-  padding: 1rem 1.5rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.9;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    font-size: 1rem;
-    padding: 0.75rem;
-  }
-`;
-
 const OrderSummary = styled.div`
   flex: 1;
   background: #fff;
   border-radius: 8px;
   padding: 2rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-
   @media (max-width: 768px) {
     order: 1;
     margin-bottom: 1.5rem;
@@ -310,7 +189,6 @@ const SummaryTitle = styled.h2`
   font-size: 1.25rem;
   margin-bottom: 1rem;
   color: #333;
-
   @media (max-width: 768px) {
     font-size: 1.1rem;
   }
@@ -323,11 +201,9 @@ const SummaryItem = styled.div`
   margin-bottom: 1rem;
   font-size: 1rem;
   color: #444;
-
   strong {
     color: #333;
   }
-
   @media (max-width: 768px) {
     font-size: 0.95rem;
     flex-direction: column;
@@ -338,36 +214,31 @@ const SummaryItem = styled.div`
 const CrossIcon = styled.img`
   width: 18px;
   height: 18px;
-  margin-left: 1rem;
+  margin-right: 1rem;
   cursor: pointer;
-
   &:hover {
     opacity: 0.7;
   }
-
   @media (max-width: 768px) {
     margin-top: 0.5rem;
-    margin-left: 0;
+    margin-right: 0;
   }
 `;
 
 const CouponWrapper = styled.div`
   display: flex;
   margin-bottom: 1.5rem;
-
   input {
     flex: 1;
     border: 1px solid #ccc;
-    border-radius: 6px 0 0 6px;
+    border-radius: 0 6px 6px 0;
     padding: 0.75rem;
     font-size: 1rem;
-
     @media (max-width: 768px) {
       font-size: 0.95rem;
       padding: 0.65rem;
     }
   }
-
   button {
     background: #ff7143;
     color: #fff;
@@ -375,13 +246,11 @@ const CouponWrapper = styled.div`
     padding: 0 1rem;
     font-weight: 600;
     cursor: pointer;
-    border-radius: 0 6px 6px 0;
+    border-radius: 6px 0 0 6px;
     font-size: 1rem;
-
     &:hover {
       opacity: 0.9;
     }
-
     @media (max-width: 768px) {
       font-size: 0.95rem;
       padding: 0 0.75rem;
@@ -392,13 +261,65 @@ const CouponWrapper = styled.div`
 const TotalAmount = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 2rem;
   font-size: 1.25rem;
   font-weight: 600;
   color: #333;
-
   @media (max-width: 768px) {
     font-size: 1.1rem;
+  }
+`;
+
+const BuyNowButton = styled.button`
+  background: #ff7143;
+  color: #fff;
+  border: none;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    opacity: 0.9;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  @media (max-width: 768px) {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+`;
+
+const Spinner = styled.div`
+  border: 2px solid #fff;
+  border-top: 2px solid #ff7143;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1rem;
   }
 `;
 
@@ -406,198 +327,252 @@ const Checkout = () => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
 
-  // Handle removing a product from cart
+  // Local state for billing info, messages, and loading/step tracking
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [country, setCountry] = useState("المملكة العربية السعودية");
+  const [city, setCity] = useState("");
+  const [street, setStreet] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(""); // "uploading" or "processing"
+
+  // Remove a product from cart
   const handleRemove = (productId) => {
     dispatch(removeProduct(productId));
   };
 
-  // 1) UPDATED: handle buy now to call your Express backend and create a Tap charge
-  const handleBuyNow = async () => {
+  // Validate the billing form and cart state
+  const validateForm = () => {
+    if (!email || !name || !country || !city || !street) {
+      setErrorMessage("يرجى تعبئة جميع الحقول المطلوبة في معلومات الفوترة.");
+      return false;
+    }
+    if (!termsAccepted) {
+      setErrorMessage("يرجى الموافقة على الشروط والأحكام للمتابعة.");
+      return false;
+    }
+    if (cart.products.length === 0) {
+      setErrorMessage("سلة التسوق فارغة. يرجى إضافة منتجات للمتابعة.");
+      return false;
+    }
+    setErrorMessage("");
+    return true;
+  };
+
+  // Combined handler: first submit order info then proceed to Tap payment
+  const handleCheckout = async () => {
+    if (!validateForm()) return;
+    setLoading(true);
+    setCurrentStep("uploading");
+
+    // Save cart details before clearing them
+    const orderTotal = cart.total;
+    const orderProducts = cart.products;
+
     try {
-      // Grab the necessary cart data:
+      // Prepare order data
+      const orderData = {
+        userId: localStorage.getItem("userId") || "guestUser",
+        products: orderProducts.map((product) => ({
+          productId: product._id,
+          quantity: product.quantity,
+        })),
+        amount: orderTotal,
+        address: {
+          country,
+          city,
+          street,
+          email,
+          name,
+        },
+        status: "pending",
+      };
+
+      // Submit order information
+      const orderResponse = await publicRequest.post("/orders", orderData);
+      if (orderResponse.data) {
+        setSuccessMessage("تم إرسال طلبك بنجاح!");
+        // Do not clear cart immediately; we'll clear it after successful payment redirection.
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      setErrorMessage("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.");
+      setLoading(false);
+      return;
+    }
+
+    // Proceed to Tap payment
+    setCurrentStep("processing");
+    try {
       const payload = {
-        amount: cart.total, // total from cart
-        currency: "USD", // or the currency you want
-        items: cart.products.map((product) => ({
+        amount: orderTotal, // use the stored total instead of cart.total
+        currency: "SAR",
+        items: orderProducts.map((product) => ({
           name: product.title,
           quantity: product.quantity,
           unit_price: product.price,
         })),
       };
 
-      // Make a POST request to your new backend route ("/api/tap-charge")
-      const response = await fetch("http://localhost:8000/api/tap-charge", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      // If Tap responded with a transaction.url, redirect user to Tap's hosted page
-      if (data?.transaction?.url) {
-        window.location.href = data.transaction.url;
+      const tapResponse = await publicRequest.post("/tap-charge", payload);
+      if (tapResponse.data?.transaction?.url) {
+        // Clear the cart only after successful tap charge creation
+        dispatch(clearCart());
+        window.location.href = tapResponse.data.transaction.url;
+        return;
       } else {
-        console.error("Tap charge creation failed:", data);
-        alert("Failed to create payment. Check console or logs.");
+        console.error("Tap charge creation failed:", tapResponse.data);
+        setErrorMessage("فشل إنشاء عملية الدفع. يرجى المحاولة مرة أخرى.");
+        setLoading(false);
       }
     } catch (error) {
-      console.error("Error in handleBuyNow:", error);
-      alert("Something went wrong while processing payment with Tap.");
+      console.error("Error in Tap payment:", error);
+      setErrorMessage("حدث خطأ أثناء معالجة الدفع مع Tap.");
+      setLoading(false);
     }
   };
 
   return (
     <PageContainer>
       <CheckoutWrapper>
-        {/* Page title & login prompt */}
         <TitleRow>
-          <CheckoutTitle>Checkout</CheckoutTitle>
+          <CheckoutTitle>الدفع</CheckoutTitle>
           <LoginPrompt>
-            Returning customer? <a href="#">Click here to login</a>
+            هل أنت عميلٌ سابق؟ <a href="#">انقر هنا لتسجيل الدخول</a>
           </LoginPrompt>
         </TitleRow>
 
+        {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+        {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
+
         <CheckoutContent>
           <OrderSummary>
-            <SummaryTitle>Order Summary</SummaryTitle>
+            <SummaryTitle>ملخص الطلب</SummaryTitle>
             {cart.products.length === 0 ? (
               <p style={{ marginBottom: "1rem" }}>
-                Your cart is empty. Add something to see it here.
+                سلة التسوق فارغة. أضف منتجات لعرضها هنا.
               </p>
             ) : (
+              ((orderProducts) => (orderProducts = cart.products),
               cart.products.map((product) => (
                 <SummaryItem key={product._id}>
                   <div>
-                    {product.title} x {product.quantity}
+                    {product.title} × {product.quantity}
                     <br />
                     <strong>
-                      ${(product.price * product.quantity).toFixed(2)}
+                      {"ر.س" + (product.price * product.quantity).toFixed(2)}
                     </strong>
                   </div>
                   <CrossIcon
                     src={Cross}
-                    alt="Remove item"
+                    alt="حذف المنتج"
                     onClick={() => handleRemove(product._id)}
                   />
                 </SummaryItem>
-              ))
+              )))
             )}
 
             <CouponWrapper>
-              <input type="text" placeholder="Coupon code" />
-              <button>Apply</button>
+              <input type="text" placeholder="كود القسيمة" />
+              <button>تطبيق</button>
             </CouponWrapper>
 
             <SummaryItem>
-              <span>Subtotal</span>
-              <strong>${cart.total.toFixed(2)}</strong>
+              <span>المجموع الفرعي</span>
+              <strong>{"ر.س" + cart.total.toFixed(2)}</strong>
             </SummaryItem>
 
             <TotalAmount>
-              <span>Total</span>
-              <span>${cart.total.toFixed(2)}</span>
+              <span>الإجمالي</span>
+              <span>{"ر.س" + cart.total.toFixed(2)}</span>
             </TotalAmount>
+
+            <TermsCheckbox>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={() => setTermsAccepted(!termsAccepted)}
+                />
+                لقد قرأت وأوافق على <a href="#">الشروط والأحكام</a>
+              </label>
+            </TermsCheckbox>
+
+            <ButtonContainer>
+              <BuyNowButton onClick={handleCheckout} disabled={loading}>
+                {loading ? (
+                  <>
+                    <Spinner />{" "}
+                    {currentStep === "uploading"
+                      ? "نقوم بمعالجة طلبك..."
+                      : "جاري التنفيذ..."}
+                  </>
+                ) : (
+                  "أرسل الطلب والدفع"
+                )}
+              </BuyNowButton>
+            </ButtonContainer>
           </OrderSummary>
 
           <BillingColumn>
             <BillingInfo>
-              <BillingTitle>Your Billing Information</BillingTitle>
+              <BillingTitle>معلومات الفوترة</BillingTitle>
               <FormField>
-                <label>Email *</label>
-                <input type="email" placeholder="Email" />
+                <label>البريد الإلكتروني *</label>
+                <input
+                  type="email"
+                  placeholder="مثال: name@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </FormField>
               <FormField>
-                <label>Name *</label>
-                <input type="text" placeholder="First and last name" />
+                <label>الاسم الكامل *</label>
+                <input
+                  type="text"
+                  placeholder="الاسم الأول واسم العائلة"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </FormField>
               <FormField>
-                <label>Street address *</label>
-                <input type="text" placeholder="Street address" />
-              </FormField>
-              <FormField>
-                <label>Town / City *</label>
-                <input type="text" placeholder="Town or city" />
-              </FormField>
-              <FormField>
-                <label>Postcode *</label>
-                <input type="text" placeholder="Postcode" />
-              </FormField>
-              <FormField>
-                <label>Select a country / region *</label>
-                <select>
-                  <option>United Kingdom</option>
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>Australia</option>
-                  <option>Other</option>
+                <label>اختر دولة/منطقة *</label>
+                <select
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                >
+                  <option value="المملكة العربية السعودية">
+                    المملكة العربية السعودية
+                  </option>
+                  <option value="المملكة المتحدة">المملكة المتحدة</option>
+                  <option value="الولايات المتحدة">الولايات المتحدة</option>
+                  <option value="كندا">كندا</option>
+                  <option value="أستراليا">أستراليا</option>
+                  <option value="دولة أخرى">دولة أخرى</option>
                 </select>
               </FormField>
               <FormField>
-                <label>State</label>
-                <input type="text" placeholder="State (if applicable)" />
+                <label>المدينة / البلدة *</label>
+                <input
+                  type="text"
+                  placeholder="أدخل اسم المدينة"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                />
               </FormField>
               <FormField>
-                <label>VAT number (Optional)</label>
-                <input type="text" placeholder="VAT number" />
+                <label>عنوان الشارع *</label>
+                <input
+                  type="text"
+                  placeholder="أدخل عنوان الشارع"
+                  value={street}
+                  onChange={(e) => setStreet(e.target.value)}
+                />
               </FormField>
             </BillingInfo>
-
-            <PaymentInfo>
-              <PaymentTitle>Payment Information</PaymentTitle>
-              <PaymentParagraph>
-                All transactions are secure and encrypted. No card information
-                is ever stored on our site.
-              </PaymentParagraph>
-
-              <RadioGroup>
-                <RadioOption>
-                  <input type="radio" name="paymentMethod" defaultChecked />
-                  Credit or Debit Card
-                  <CardIcons>
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg"
-                      alt="Visa"
-                    />
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/c/c0/Mastercard-logo.svg"
-                      alt="Mastercard"
-                    />
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Amex.svg"
-                      alt="Amex"
-                    />
-                  </CardIcons>
-                </RadioOption>
-              </RadioGroup>
-
-              <FormField>
-                <label>Card number *</label>
-                <input type="text" placeholder="Card number" />
-              </FormField>
-
-              <CardFieldRow>
-                <PaymentField>
-                  <label>Expiry date *</label>
-                  <input type="text" placeholder="MM / YY" />
-                </PaymentField>
-                <PaymentField>
-                  <label>CVC *</label>
-                  <input type="text" placeholder="CVC" />
-                </PaymentField>
-              </CardFieldRow>
-
-              <TermsCheckbox>
-                <label>
-                  <input type="checkbox" />I have read and agree to the website{" "}
-                  <a href="#">Terms and conditions</a> *
-                </label>
-              </TermsCheckbox>
-
-              <BuyNowButton onClick={handleBuyNow}>Buy Now</BuyNowButton>
-            </PaymentInfo>
           </BillingColumn>
         </CheckoutContent>
       </CheckoutWrapper>

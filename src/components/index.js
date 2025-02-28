@@ -22,7 +22,6 @@ export { default as Bottom } from "./Bottom/Bottom";
 export { default as OrderComplete } from "./OrderComplete/OrderComplete";
 export { default as Breath } from "./Breath/Breath";
 export { default as Social } from "./Social/Social";
-export { default as Post } from "./Post/Post";
-export { default as Relate } from "./Relate/Relate";
+export { default as Podcast } from "./Podcast/Podcast";
 export { default as Very } from "./Very/Very";
 export { default as Last } from "./Last/Last";
