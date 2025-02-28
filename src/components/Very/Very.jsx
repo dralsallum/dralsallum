@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import Charcter from "../../assets/hero-saud.png";
 import Avatar from "../../assets/Avatars.png";
@@ -381,7 +382,7 @@ const Very = () => {
               من خلال تقديم هذا النموذج، ستقوم بالاشتراك في النشرة الإخبارية
               المجانية. قد أرسل لك أيضًا رسائل بريد إلكتروني أخرى حول دوراتي.
               يمكنك إلغاء الاشتراك في أي وقت. لمزيد من المعلومات، راجع{" "}
-              <a href="#">سياسة الخصوصية</a>.
+              <Link to="/policy">سياسة الخصوصية</Link>.
             </PrivacyText>
           </NewsletterSection>
         </ContentSection>
