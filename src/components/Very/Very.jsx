@@ -69,7 +69,7 @@ const ContainerAll = styled.div`
   background: #f8f6f2;
   border-radius: 16px;
   overflow: hidden;
-  position: relative; /* Needed for the mobile menu positioning */
+  position: relative;
 
   @media (max-width: 768px) {
     margin: 10px 15px;
@@ -329,8 +329,8 @@ const Very = () => {
             مرحبًا أصدقائي! <Underline></Underline>
           </Heading>
           <Description>
-            أنا سعود. طبيب رائد أعمال، وصانع محتوى على يوتيوب، ومؤلف أكثر الكتب
-            مبيعًا في نيويورك تايمز "إنتاجية تبعث على الشعور بالراحة".
+            أنا سعود. طبيب رائد أعمال، وصانع محتوى على يوتيوب، وصاحب أحد أكبر
+            التطبيقات لتعليم اللغة الإنجليزية فلونت فوكس
           </Description>
 
           <NewsletterSection>
@@ -338,7 +338,7 @@ const Very = () => {
               اشترك في لايف نوتس <PlanIcon src={Plan} alt="Plan Icon" />
             </NewsletterTitle>
             <SubscriberCount>
-              انضم إلى مجتمع متنامٍ يضم أكثر من 260,000 قارئ ودود.
+              انضم إلى مجتمع متنامٍ يضم أكثر من 260,000 قارئ
             </SubscriberCount>
 
             <ReviewSection>
