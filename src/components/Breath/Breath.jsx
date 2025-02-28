@@ -1,7 +1,7 @@
 // AboutAli.jsx
 import React from "react";
 import styled from "styled-components";
-import Charcter from "../../assets/hero-saud.png";
+import Character from "../../assets/hero-saud.png";
 
 const AboutContainer = styled.section`
   background: #edf4f7;
@@ -14,17 +14,17 @@ const AboutContainer = styled.section`
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
+  direction: rtl;
 
   @media (max-width: 768px) {
     padding: 2rem 1rem;
     margin: 10px 15px;
     border-radius: 10px;
     flex-direction: column;
-    text-align: center; /* على الجوال، سيتم توسيط النص */
+    text-align: center;
   }
 `;
 
-/* تغليف الصورة الدائرية */
 const ImageWrapper = styled.div`
   width: 300px;
   height: 300px;
@@ -45,10 +45,6 @@ const ProfileImage = styled.img`
   display: block;
 `;
 
-/* 
-  محتوى النص: إزالة `flex: 1;` حتى لا يتمدد،
-  تحديد الحد الأقصى للعرض وتوسيطه داخل التخطيط المرن
-*/
 const TextContent = styled.div`
   max-width: 600px;
 `;
@@ -67,37 +63,31 @@ const Paragraph = styled.p`
   margin-bottom: 1rem;
 `;
 
-export default function AboutAli() {
+const Breath = () => {
   return (
     <AboutContainer>
       <ImageWrapper>
-        <ProfileImage src={Charcter} alt="الملف الشخصي" />
+        <ProfileImage src={Character} alt="الملف الشخصي" />
       </ImageWrapper>
 
       <TextContent>
-        <SubTitle>
-          قناة يوتيوب يمكن أن تغير حياتك تمامًا – لقد غيرت حياتي
-        </SubTitle>
+        <SubTitle>تمكين الحياة من خلال المعرفة والابتكار</SubTitle>
 
         <Paragraph>
-          بدأت في صنع فيديوهات يوتيوب في عام 2017، أثناء عامي الأخير في كلية
-          الطب بجامعة كامبريدج.
+          أنا طبيب ومبرمج اتجهت لإنشاء المحتوى كوسيلة لمساعدة الناس على التعلم
+          وتطوير أنفسهم.
         </Paragraph>
         <Paragraph>
-          بدأت من الصفر: <strong>0 مشاهدة</strong>، <strong>0 مشترك</strong> و
-          <strong>0 دولار</strong> كإيرادات. لم أكن أعرف شيئًا عن التصوير أو
-          المونتاج أو نشر الفيديوهات.
+          تخرجت من جامعة الملك سعود في عام 2017، ومنذ ذلك الحين، كرست نفسي لدمج
+          خبرتي في الطب والتكنولوجيا لإلهام وتعليم الآخرين.
         </Paragraph>
         <Paragraph>
-          لكن بعد مشاهدة مئات الدروس على يوتيوب، تعلمت الأساسيات. بعد 18 شهرًا،
-          وصل عدد مشتركي قناتي إلى <strong>100,000 مشترك</strong> وأصبحت أرباحها
-          تعادل راتبي كطبيب بدوام كامل.
-        </Paragraph>
-        <Paragraph>
-          وبعد عامين، تجاوز عدد المشتركين المليون، وبلغت الإيرادات السنوية{" "}
-          <strong>مليون دولار</strong>، وأخيرًا قررت الالتزام الكامل بيوتيوب.
+          هدفي هو إنشاء محتوى جذاب ومفيد يمكِّنك من النمو، وتعلم مهارات جديدة،
+          وإحداث تغيير إيجابي في حياتك.
         </Paragraph>
       </TextContent>
     </AboutContainer>
   );
-}
+};
+
+export default Breath;
