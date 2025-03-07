@@ -17,6 +17,8 @@ import Audio from "./pages/Audio";
 import Outcome from "./pages/Outcome";
 import Job from "./pages/Job";
 import { Breath, OrderComplete } from "./components";
+import Lesson from "./pages/Lesson";
+import Teach from "./pages/Teach";
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);
@@ -36,7 +38,8 @@ const App = () => {
 
         {/* UPDATED ROUTE: capture article title as a URL parameter */}
         <Route path="/main/:articleTitle" element={<Something />} />
-
+        <Route path="/lesson" element={<Lesson />} />
+        <Route path="/learning/:slug" element={<Teach />} />
         <Route path="/order-complete" element={<OrderComplete />} />
 
         {/* If user is logged in, redirect from signup to home */}
