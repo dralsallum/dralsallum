@@ -1,8 +1,44 @@
-import React from "react";
-import styled from "styled-components";
-import { Link } from "react-router-dom";
+// Course.jsx
 
-/* ====== Page Wrapper ====== */
+import React, { useState, useEffect } from "react";
+import styled, { keyframes } from "styled-components";
+import { Link } from "react-router-dom";
+import { publicRequest } from "../../requestMethods";
+
+/* ====== Loading Animation Styles ====== */
+const loadAnimation = keyframes`
+  0% { left: -50%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  background-color: #fff;
+`;
+
+const LoadingBar = styled.div`
+  position: relative;
+  width: 200px;
+  height: 4px;
+  background: #ddd;
+  border-radius: 2px;
+  overflow: hidden;
+  &::before {
+    content: "";
+    position: absolute;
+    left: -50%;
+    width: 50%;
+    height: 100%;
+    background-color: #ff7143;
+    animation: ${loadAnimation} 1s infinite linear;
+  }
+`;
+
+/* ====== Main Page Wrapper ====== */
 const PageWrapper = styled.div`
   padding: 2rem;
   direction: rtl;
@@ -10,7 +46,7 @@ const PageWrapper = styled.div`
   min-height: 100vh;
 `;
 
-/* Top Bar (Category, Author, Search) */
+/* ====== Top Bar (Filters + Search) ====== */
 const TopBar = styled.div`
   display: flex;
   align-items: center;
@@ -28,7 +64,6 @@ const Filters = styled.div`
 const SearchContainer = styled.div`
   position: relative;
   width: 250px;
-
   @media (max-width: 768px) {
     width: 180px;
   }
@@ -43,24 +78,24 @@ const SearchInput = styled.input`
   color: #333;
 `;
 
-/* Heading "Courses" */
+/* ====== Heading ====== */
 const Heading = styled.h2`
   font-size: 1.4rem;
   margin-bottom: 1.5rem;
   color: #222;
 `;
 
-/* ====== Course Card Section ====== */
+/* ====== Courses Grid ====== */
 const CoursesGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
 `;
 
+/* ====== Course Card ====== */
 const CourseLink = styled(Link)`
-  /* This wrapper ensures the entire card is clickable */
   text-decoration: none;
-  color: inherit; /* Inherit text color so it doesn't look like a blue link */
+  color: inherit;
 `;
 
 const CourseCard = styled.div`
@@ -69,23 +104,31 @@ const CourseCard = styled.div`
   border-radius: 8px;
   padding: 1rem;
   background-color: #fafafa;
-
+  transition: box-shadow 0.2s ease;
   &:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 `;
 
-const CourseImageWrapper = styled.div`
+const CourseImage = styled.img`
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+`;
+
+const PlaceholderImageWrapper = styled.div`
   width: 100%;
   height: 180px;
   background-color: #f0f0f0;
   border-radius: 4px;
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
   color: #aaa;
-  margin-bottom: 1rem;
 `;
 
 const CourseTitle = styled.h3`
@@ -95,43 +138,22 @@ const CourseTitle = styled.h3`
   margin-bottom: 0.5rem;
 `;
 
+/* ====== Progress Bar ====== */
 const CourseProgressBar = styled.div`
   width: 100%;
-  height: 5px;
+  height: 6px;
   background-color: #ddd;
   margin: 0.5rem 0 1rem;
   border-radius: 4px;
   overflow: hidden;
   position: relative;
-
-  &::after {
-    content: "";
-    position: absolute;
-    width: 0%; /* 0% complete */
-    height: 100%;
-    background-color: #ff7143;
-    left: 0;
-    top: 0;
-  }
 `;
 
-const CourseAuthorProgress = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const CourseAuthor = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.9rem;
-  color: #666;
-
-  &::before {
-    content: "👤";
-    display: inline-block;
-  }
+const ProgressBarFill = styled.div`
+  height: 100%;
+  background-color: #ff7143;
+  transition: width 0.3s ease;
+  width: ${(props) => props.percent}%;
 `;
 
 const ProgressText = styled.span`
@@ -141,6 +163,41 @@ const ProgressText = styled.span`
 `;
 
 const Course = () => {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Basic search state
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Fetch all courses on component mount
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const res = await publicRequest.get("/courses");
+        setCourses(res.data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  // Filter courses by search term
+  const filteredCourses = courses.filter((course) =>
+    course.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <LoadingContainer>
+        <LoadingBar />
+      </LoadingContainer>
+    );
+  }
+
   return (
     <PageWrapper>
       <TopBar>
@@ -149,27 +206,44 @@ const Course = () => {
           <span>Author: All</span>
         </Filters>
         <SearchContainer>
-          <SearchInput type="text" placeholder="Find a product" />
+          <SearchInput
+            type="text"
+            placeholder="ابحث عن دورة"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </SearchContainer>
       </TopBar>
 
-      <Heading>Courses</Heading>
+      <Heading>الدورات</Heading>
 
       <CoursesGrid>
-        {/* Wrap the card with Link to make the entire card clickable */}
-        <CourseLink to="/teach">
-          <CourseCard>
-            <CourseImageWrapper>II</CourseImageWrapper>
-            <CourseTitle>
-              كيفية الدراسة بفعالية: دليلك نحو التميز الأكاديمي
-            </CourseTitle>
-            <CourseProgressBar />
-            <CourseAuthorProgress>
-              <CourseAuthor>Saud Alsallum</CourseAuthor>
-              <ProgressText>0% COMPLETE</ProgressText>
-            </CourseAuthorProgress>
-          </CourseCard>
-        </CourseLink>
+        {filteredCourses.length === 0 ? (
+          <p>لا توجد دورات مطابقة لبحثك</p>
+        ) : (
+          filteredCourses.map((course) => (
+            <CourseLink key={course._id} to={`/learning/${course.slug}`}>
+              <CourseCard>
+                {/* If a thumbnail URL exists, display it; otherwise show a placeholder */}
+                {course.thumbnail ? (
+                  <CourseImage
+                    src={course.thumbnail}
+                    alt={`Thumbnail for ${course.title}`}
+                  />
+                ) : (
+                  <PlaceholderImageWrapper>📚</PlaceholderImageWrapper>
+                )}
+
+                <CourseTitle>{course.title}</CourseTitle>
+
+                <CourseProgressBar>
+                  <ProgressBarFill percent={course.completion} />
+                </CourseProgressBar>
+                <ProgressText>{course.completion}% COMPLETE</ProgressText>
+              </CourseCard>
+            </CourseLink>
+          ))
+        )}
       </CoursesGrid>
     </PageWrapper>
   );

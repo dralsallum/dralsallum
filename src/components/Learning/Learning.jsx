@@ -1,10 +1,67 @@
-import React, { useState, useEffect, useRef } from "react";
-import styled from "styled-components";
-import { useParams } from "react-router-dom";
-import { FaHome, FaCog, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+// Learning.jsx
+import React, { useState, useEffect } from "react";
+import styled, { keyframes } from "styled-components";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { publicRequest, userRequest } from "../../requestMethods";
 
-/* =================== Styled Components =================== */
+/* ========= Loading Styles ========== */
+const loadAnimation = keyframes`
+  0% {
+    left: -50%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* You can adjust this if you prefer a different layout */
+  background-color: #fff;
+`;
+
+const LoadingBar = styled.div`
+  position: relative;
+  width: 200px; /* width of the loading bar */
+  height: 4px; /* thickness of the loading bar */
+  background: #ddd;
+  border-radius: 2px;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: -50%;
+    width: 50%;
+    height: 100%;
+    background-color: #ff7143;
+    animation: ${loadAnimation} 1s infinite linear;
+  }
+`;
+
+/* ========= Spinner (Loading Gear) for "Complete Lesson" button ========== */
+const spinAnimation = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const Spinner = styled.div`
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #ff7143;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: ${spinAnimation} 1s linear infinite;
+`;
+
+/* ========= Styled Components for Page Layout ========== */
+
 const PageWrapper = styled.div`
   width: 100%;
   min-height: 100vh;
@@ -14,35 +71,10 @@ const PageWrapper = styled.div`
   background-color: #fff;
 `;
 
-const TopNav = styled.nav`
-  width: 100%;
-  background-color: #2d3e3c;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-`;
-
-const TopNavLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const IconButton = styled.button`
-  background: transparent;
-  border: none;
-  color: inherit;
-  font-size: 1.2rem;
-  cursor: pointer;
-`;
-
 const ContentContainer = styled.div`
   flex: 1;
   display: flex;
   overflow: hidden;
-
   @media (max-width: 768px) {
     flex-direction: column;
   }
@@ -53,7 +85,6 @@ const Sidebar = styled.aside`
   background-color: #fafafa;
   border-right: 1px solid #ddd;
   padding: 1rem;
-
   @media (max-width: 768px) {
     width: 100%;
     border-right: none;
@@ -103,7 +134,6 @@ const LessonItem = styled.li`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-
   &:hover {
     background-color: #c8ebe0;
   }
@@ -111,17 +141,21 @@ const LessonItem = styled.li`
 
 const LessonIcon = styled.div`
   font-size: 1.2rem;
-  color: #333;
+  color: ${(props) => (props.completed ? "#27ae60" : "#333")};
 `;
 
 const MainContent = styled.section`
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
-
   @media (max-width: 768px) {
     padding: 1rem 0.5rem;
   }
+`;
+
+const LessonTitle = styled.h3`
+  margin-bottom: 0.5rem;
+  color: #333;
 `;
 
 const VideoPlayer = styled.video`
@@ -130,6 +164,7 @@ const VideoPlayer = styled.video`
   height: auto;
   border-radius: 4px;
   background-color: #000;
+  margin-bottom: 1rem;
 `;
 
 const QuizSection = styled.div`
@@ -139,7 +174,7 @@ const QuizSection = styled.div`
   border-radius: 6px;
 `;
 
-const QuizTitle = styled.h3`
+const QuizTitle = styled.h4`
   margin-bottom: 0.5rem;
 `;
 
@@ -176,7 +211,6 @@ const SubmitButton = styled.button`
   cursor: pointer;
   font-weight: 600;
   align-self: flex-start;
-
   &:hover {
     background-color: #2d3e3cdd;
   }
@@ -193,13 +227,19 @@ const CompleteButton = styled.button`
   font-size: 0.9rem;
   margin-top: 1.5rem;
   align-self: flex-start;
-
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   &:hover {
     background-color: #17a085;
   }
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 `;
 
-/* Modal Overlay / Content */
+/* ---- Modal ---- */
 const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -228,7 +268,6 @@ const ModalTitle = styled.h2`
   color: #333;
 `;
 
-/* Checklist for correct/wrong icons */
 const Checklist = styled.ul`
   list-style: none;
   margin: 0;
@@ -267,49 +306,39 @@ const CloseModalButton = styled.button`
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-
   &:hover {
     background-color: #2d3e3cdd;
   }
 `;
 
-/* =================== MAIN COMPONENT =================== */
-const Learning = () => {
-  /* 1) Get slug from URL, e.g. /learning/:slug */
-  const { slug } = useParams();
+/* ========== Main Learning Component ========== */
 
-  /* 2) State for Course & Loading */
+const Learning = () => {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  /* 3) Quiz & Modal State */
+  // Which lesson is currently being viewed?
+  const [activeLessonIndex, setActiveLessonIndex] = useState(0);
+
+  // For quiz answers and results
   const [answers, setAnswers] = useState({});
   const [results, setResults] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  /* 4) "Server Completion": we store the snapped % from the server here */
-  const [serverCompletion, setServerCompletion] = useState(0);
+  // Spinner state for completing a lesson
+  const [completingLesson, setCompletingLesson] = useState(false);
 
-  /* Keep track of the last raw progress we sent, to avoid spam updates */
-  const [lastSentProgress, setLastSentProgress] = useState(null);
-
-  const videoRef = useRef(null);
-
-  /* Fetch the course on mount or slug change */
+  // Fetch the course data
   useEffect(() => {
     const fetchCourse = async () => {
       try {
+        setLoading(true);
         const res = await publicRequest.get(`/courses/${slug}`);
         setCourse(res.data);
-        setServerCompletion(res.data.completion || 0); // from DB
         setLoading(false);
-
-        // Initialize answers object
-        const initialAnswers = {};
-        res.data.quiz.forEach((q, index) => {
-          initialAnswers[`q${index + 1}`] = "";
-        });
-        setAnswers(initialAnswers);
       } catch (error) {
         console.error("Error fetching course:", error);
         setLoading(false);
@@ -318,175 +347,219 @@ const Learning = () => {
     fetchCourse();
   }, [slug]);
 
-  /* Handle video time updates -> push to server to snap to 20% */
-  const handleTimeUpdate = async () => {
-    if (!videoRef.current || !course) return;
-    const current = videoRef.current.currentTime;
-    const duration = videoRef.current.duration || 0;
-    if (duration <= 0) return;
+  // Reset quiz answers when active lesson changes
+  useEffect(() => {
+    if (!course || !course.lessons[activeLessonIndex]) return;
+    const lesson = course.lessons[activeLessonIndex];
 
-    // Round to integer, let the server do the 20% snapping
-    const rawIntegerProgress = Math.round((current / duration) * 100);
+    // Initialize answers
+    const initAnswers = {};
+    lesson.quiz.forEach((q, idx) => {
+      initAnswers[`q${idx + 1}`] = "";
+    });
+    setAnswers(initAnswers);
+    setResults([]);
+    setIsModalOpen(false);
+  }, [course, activeLessonIndex]);
 
-    // Only send if it changed from last time we sent
-    if (rawIntegerProgress !== lastSentProgress) {
-      setLastSentProgress(rawIntegerProgress);
-      try {
-        // Send to server
-        const res = await userRequest.put(`/courses/${slug}/completion`, {
-          progress: rawIntegerProgress,
-        });
-        // Update local "serverCompletion"
-        if (res.data?.course?.completion !== undefined) {
-          setServerCompletion(res.data.course.completion);
-        }
-      } catch (err) {
-        console.error("Error updating completion:", err);
-      }
-    }
+  // Handling lesson selection from the sidebar
+  const handleSelectLesson = (index) => {
+    setActiveLessonIndex(index);
   };
 
-  /* Handle radio changes for quiz */
+  // Handle quiz changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setAnswers((prev) => ({ ...prev, [name]: value }));
   };
 
-  /* Submit quiz logic */
+  // Submit quiz
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!course) return;
 
-    const newResults = course.quiz.map((q, index) => {
-      const userAnswer = answers[`q${index + 1}`];
+    const lesson = course.lessons[activeLessonIndex];
+    const newResults = lesson.quiz.map((q, idx) => {
+      const userAnswer = answers[`q${idx + 1}`];
       const isCorrect = userAnswer === q.correctAnswer;
-      return { questionIndex: index + 1, isCorrect };
+      return { questionIndex: idx + 1, isCorrect };
     });
 
     setResults(newResults);
     setIsModalOpen(true);
   };
 
+  // Close modal
   const closeModal = () => {
     setIsModalOpen(false);
   };
 
-  const handleComplete = () => {
-    alert("You have completed this lesson. Moving on!");
+  // Mark the lesson as complete on the backend, then move to next lesson
+  const handleCompleteLesson = async () => {
+    if (!course) return;
+
+    try {
+      setCompletingLesson(true);
+      await userRequest.patch(
+        `/courses/${course.slug}/lessons/${activeLessonIndex}/complete`,
+        { isCompleted: true }
+      );
+
+      // Re-fetch or update local state to reflect new completion
+      const refreshed = await publicRequest.get(`/courses/${slug}`);
+      setCourse(refreshed.data);
+      setCompletingLesson(false);
+
+      // Automatically move to the next lesson (if any)
+      if (activeLessonIndex < refreshed.data.lessons.length - 1) {
+        setActiveLessonIndex((prev) => prev + 1);
+      } else {
+        // If it's the last lesson, you can navigate somewhere else or do something special
+        console.log("All lessons completed!");
+        // e.g., navigate("/courses/completed");
+      }
+    } catch (error) {
+      console.error("Error completing lesson:", error);
+      setCompletingLesson(false);
+    }
   };
 
-  // Derived quiz correctness
+  // Show loading bar if data is not yet fetched
+  if (loading) {
+    return (
+      <LoadingContainer>
+        <LoadingBar />
+      </LoadingContainer>
+    );
+  }
+
+  // If no course found after loading
+  if (!course) return <div>Course not found!</div>;
+
+  // Current lesson
+  const currentLesson = course.lessons[activeLessonIndex];
+
+  // Overall course completion
+  const overallCompletion = course.completion || 0;
+
+  // Quiz correctness
   const correctCount = results.filter((r) => r.isCorrect).length;
-  const totalQuestions = course?.quiz?.length || 0;
+  const totalQuestions = currentLesson ? currentLesson.quiz.length : 0;
   const correctnessPercent = totalQuestions
     ? Math.round((correctCount / totalQuestions) * 100)
     : 0;
 
-  if (loading) return <div>Loading...</div>;
-  if (!course) return <div>Course not found!</div>;
-
   return (
     <PageWrapper>
-      {/* Top Nav */}
-      <TopNav>
-        <TopNavLeft>
-          <IconButton>
-            <FaHome />
-          </IconButton>
-          <IconButton>
-            <FaCog />
-          </IconButton>
-        </TopNavLeft>
-      </TopNav>
-
-      {/* Sidebar + Main */}
       <ContentContainer>
+        {/* Sidebar */}
         <Sidebar>
           <CourseTitle>{course.title}</CourseTitle>
-
           <ProgressContainer>
-            {/* Show server-snapped completion */}
-            <div>{serverCompletion}% COMPLETE</div>
+            <div>{overallCompletion}% COMPLETE</div>
             <ProgressBarWrapper>
-              <ProgressBar style={{ width: `${serverCompletion}%` }} />
+              <ProgressBar style={{ width: `${overallCompletion}%` }} />
             </ProgressBarWrapper>
           </ProgressContainer>
 
+          {/* List of Lessons */}
           <LessonsList>
-            <LessonItem>
-              <LessonIcon>▶</LessonIcon>
-              <div>{course.title} (1:21)</div>
-            </LessonItem>
+            {course.lessons.map((lesson, idx) => (
+              <LessonItem key={idx} onClick={() => handleSelectLesson(idx)}>
+                <LessonIcon completed={lesson.isCompleted}>
+                  {lesson.isCompleted ? "✔" : "▶"}
+                </LessonIcon>
+                <div>{lesson.title}</div>
+              </LessonItem>
+            ))}
           </LessonsList>
         </Sidebar>
 
-        {/* Main Content */}
+        {/* MainContent */}
         <MainContent>
-          <VideoPlayer
-            ref={videoRef}
-            controls
-            onTimeUpdate={handleTimeUpdate}
-            src={course.videoUrl}
-            type="video/mp4"
-          >
-            Your browser does not support the video tag.
-          </VideoPlayer>
+          {currentLesson && (
+            <>
+              <LessonTitle>
+                الدرس {activeLessonIndex + 1}: {currentLesson.title}
+              </LessonTitle>
+              <VideoPlayer
+                controls
+                src={currentLesson.videoUrl}
+                type="video/mp4"
+              >
+                Your browser does not support HTML5 video.
+              </VideoPlayer>
 
-          {/* Quiz */}
-          <QuizSection>
-            <QuizTitle>Quiz</QuizTitle>
-            <QuizForm onSubmit={handleSubmit}>
-              {course.quiz.map((quizItem, index) => {
-                const qName = `q${index + 1}`;
-                return (
-                  <QuestionWrapper key={qName}>
-                    <QuestionText>{quizItem.question}</QuestionText>
-                    <OptionsList>
-                      {quizItem.options.map((opt, i) => (
-                        <label key={i}>
-                          <input
-                            type="radio"
-                            name={qName}
-                            value={opt}
-                            checked={answers[qName] === opt}
-                            onChange={handleChange}
-                          />
-                          {opt}
-                        </label>
-                      ))}
-                    </OptionsList>
-                  </QuestionWrapper>
-                );
-              })}
-              <SubmitButton type="submit">إرسال الإجابات</SubmitButton>
-            </QuizForm>
-          </QuizSection>
+              <QuizSection>
+                <QuizTitle>الاختبار</QuizTitle>
+                {currentLesson.quiz.length === 0 ? (
+                  <p>لا يوجد أسئلة لهذا الدرس.</p>
+                ) : (
+                  <QuizForm onSubmit={handleSubmit}>
+                    {currentLesson.quiz.map((q, idx) => {
+                      const qName = `q${idx + 1}`;
+                      return (
+                        <QuestionWrapper key={idx}>
+                          <QuestionText>{q.question}</QuestionText>
+                          <OptionsList>
+                            {q.options.map((opt, i) => (
+                              <label key={i}>
+                                <input
+                                  type="radio"
+                                  name={qName}
+                                  value={opt}
+                                  checked={answers[qName] === opt}
+                                  onChange={handleChange}
+                                />
+                                {opt}
+                              </label>
+                            ))}
+                          </OptionsList>
+                        </QuestionWrapper>
+                      );
+                    })}
+                    <SubmitButton type="submit">إرسال الإجابات</SubmitButton>
+                  </QuizForm>
+                )}
+              </QuizSection>
 
-          <CompleteButton onClick={handleComplete}>
-            Complete and Continue
-          </CompleteButton>
+              {/* Mark Lesson Complete */}
+              {!currentLesson.isCompleted && (
+                <CompleteButton
+                  onClick={handleCompleteLesson}
+                  disabled={completingLesson}
+                >
+                  {completingLesson ? (
+                    <>
+                      <Spinner />
+                      جاري الإكمال...
+                    </>
+                  ) : (
+                    "إكمال الدرس"
+                  )}
+                </CompleteButton>
+              )}
+            </>
+          )}
         </MainContent>
       </ContentContainer>
 
-      {/* Modal */}
+      {/* Quiz Results Modal */}
       {isModalOpen && (
         <ModalOverlay onClick={closeModal}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
             <ModalTitle>نتيجة الاختبار</ModalTitle>
-
             <Checklist>
               {results.map((r) => (
                 <CheckItem key={r.questionIndex}>
                   {r.isCorrect ? <CheckIconCorrect /> : <CheckIconWrong />}
-                  <span>Question {r.questionIndex}</span>
+                  <span>السؤال {r.questionIndex}</span>
                 </CheckItem>
               ))}
             </Checklist>
-
             <PercentageMessage>
               نسبة نجاحك: {correctnessPercent}%
             </PercentageMessage>
-
             <CloseModalButton onClick={closeModal}>إغلاق</CloseModalButton>
           </ModalContent>
         </ModalOverlay>
