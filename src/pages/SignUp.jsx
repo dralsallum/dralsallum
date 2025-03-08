@@ -1,11 +1,12 @@
 import React from "react";
-import { NavTech, SignForm } from "../components";
+import { NavTech, SignForm, Footer } from "../components";
 
 const SignUp = () => {
   return (
     <>
       <NavTech />
       <SignForm />
+      <Footer />
     </>
   );
 };

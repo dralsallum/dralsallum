@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { register, signIn } from "../../redux/userRedux"; // Adjust the import path
+import { register } from "../../redux/userRedux";
 import {
   LoginContainer,
-  RegistarButton,
   SignButton,
   LoginSignHeader,
   LoginSignInput,
@@ -18,16 +17,24 @@ const SignForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formInputs, setFormInputs] = useState({
+    username: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
   const [errorMessage, setErrorMessage] = useState("");
-  const { isFetching, error } = useSelector((state) => state.user);
+  const { isFetching } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    let newValue = value;
+    // Auto capitalize the first letter of username
+    if (name === "username" && value.length > 0) {
+      newValue = value.charAt(0).toUpperCase() + value.slice(1);
+    }
     setFormInputs((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
+      [name]: newValue,
     }));
   };
 
@@ -42,52 +49,24 @@ const SignForm = () => {
     dispatch(register(formInputs));
   };
 
-  const handleSignIn = (e) => {
-    e.preventDefault();
-
-    dispatch(
-      signIn({
-        username: formInputs.username,
-        email: formInputs.email,
-        password: formInputs.password,
-      })
-    )
-      .unwrap()
-      .then(() => {
-        navigate("/");
-      })
-      .catch((error) => {
-        setErrorMessage(getArabicErrorMessage(error.message));
-      });
-  };
-
-  const getArabicErrorMessage = (englishMessage) => {
-    switch (englishMessage) {
-      case "The email address is already in use by another account.":
-        return "عنوان البريد الإلكتروني مستخدم بالفعل من قبل حساب آخر.";
-      case "Invalid password":
-        return "يجب أن تكون كلمة المرور مكونة من 6 عناصر وتحتوي على أحرف وأرقام.";
-      // ... add other translations as needed
-      default:
-        return "حدث خطأ غير معروف. يرجى المحاولة مرة أخرى.";
-    }
-  };
   return (
     <SignContainer>
       <LoginContainer>
-        <LoginSignHeader>تسجيل دخول</LoginSignHeader>
+        <LoginSignHeader>إنشاء حساب جديد</LoginSignHeader>
         {errorMessage && <div style={{ color: "red" }}>{errorMessage}</div>}
-        <SignUpForm onSubmit={handleSignIn}>
+        <SignUpForm onSubmit={handleSubmit}>
           <LoginSignSubHeader>اسم المستخدم</LoginSignSubHeader>
           <LoginSignInput
             name="username"
             placeholder="اسم المستخدم"
+            value={formInputs.username}
             onChange={handleChange}
           />
           <LoginSignSubHeader>ايميل</LoginSignSubHeader>
           <LoginSignInput
             name="email"
             placeholder="الايميل"
+            value={formInputs.email}
             onChange={handleChange}
           />
           <LoginSignSubHeader>الرقم السري</LoginSignSubHeader>
@@ -95,6 +74,7 @@ const SignForm = () => {
             type="password"
             name="password"
             placeholder="الباسورد"
+            value={formInputs.password}
             onChange={handleChange}
           />
           <LoginSignSubHeader>تاكيد الرقم السري</LoginSignSubHeader>
@@ -102,18 +82,32 @@ const SignForm = () => {
             type="password"
             name="confirmPassword"
             placeholder="تاكيد الباسورد"
+            value={formInputs.confirmPassword}
             onChange={handleChange}
           />
-          <SignButton>تسجيل الدخول</SignButton>
+          <SignButton type="submit" disabled={isFetching}>
+            {isFetching ? (
+              <>
+                <i
+                  className="fa fa-cog fa-spin"
+                  style={{ marginRight: "8px" }}
+                />
+                جاري إنشاء الحساب...
+              </>
+            ) : (
+              "إنشاء حساب جديد"
+            )}
+          </SignButton>
         </SignUpForm>
         <LoginSignPara>
-          بتسجيل الدخول، أنت توافق على شروط استخدام ١٢انجليش. يُرجى الاطلاع على
-          إشعار الخصوصية الخاص بنا، وإشعار الكوكيز، وإشعار الإعلانات المستندة
-          إلى الاهتمامات.
+          لديك حساب بالفعل؟{" "}
+          <span
+            style={{ color: "blue", cursor: "pointer" }}
+            onClick={() => navigate("/login")}
+          >
+            تسجيل الدخول
+          </span>
         </LoginSignPara>
-        <RegistarButton type="submit" onClick={handleSubmit}>
-          تسجيل حساب جديد
-        </RegistarButton>
       </LoginContainer>
     </SignContainer>
   );

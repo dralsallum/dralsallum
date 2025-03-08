@@ -20,6 +20,8 @@ import { Breath, OrderComplete } from "./components";
 import Lesson from "./pages/Lesson";
 import Teach from "./pages/Teach";
 import Login from "./pages/Login";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import SubscriptionPage from "./pages/SubscriptionPage";
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);
@@ -38,8 +40,25 @@ const App = () => {
 
         {/* UPDATED ROUTE: capture article title as a URL parameter */}
         <Route path="/main/:articleTitle" element={<Something />} />
-        <Route path="/lesson" element={<Lesson />} />
-        <Route path="/learning/:slug" element={<Teach />} />
+
+        {/* Protected Routes that require login and paid subscription */}
+        <Route
+          path="/lesson"
+          element={
+            <ProtectedRoute requirePaid={true}>
+              <Lesson />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/learning/:slug"
+          element={
+            <ProtectedRoute requirePaid={true}>
+              <Teach />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/order-complete" element={<OrderComplete />} />
 
         {/* If user is logged in, redirect from signup to home */}
@@ -48,6 +67,9 @@ const App = () => {
           element={user ? <Navigate to="/" /> : <SignUp />}
         />
         <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+
+        {/* Add a subscription route for users who need to upgrade */}
+        <Route path="/upgrade" element={<SubscriptionPage />} />
       </Routes>
     </Router>
   );

@@ -39,7 +39,7 @@ export const LoginSignInput = styled.input`
 
 export const LoginSignPara = styled.p`
   margin-top: 15px;
-  font-size: 12px;
+  font-size: 14px;
 `;
 
 export const SignButton = styled.button`
@@ -51,6 +51,7 @@ export const SignButton = styled.button`
   margin-top: 10px;
   border-color: #1a2d8a;
   color: white;
+  cursor: pointer;
 
   :hover {
     cursor: pointer;
