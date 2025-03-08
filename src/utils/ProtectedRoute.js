@@ -7,13 +7,13 @@ const ProtectedRoute = ({ children, requirePaid = false }) => {
 
   // Check if user is logged in
   if (!user) {
-    return <Navigate to="/subscription" />;
+    return <Navigate to="/upgrade" />;
   }
 
   // If route requires paid access, check isPaid status
   if (requirePaid && !user.isPaid) {
     // Redirect to a subscription page or show payment information
-    return <Navigate to="/subscription" />;
+    return <Navigate to="/upgrade" />;
   }
 
   return children;
