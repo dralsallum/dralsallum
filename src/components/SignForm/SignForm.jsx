@@ -41,26 +41,12 @@ const SignForm = () => {
     e.preventDefault();
     try {
       await dispatch(register(inputs)).unwrap();
-      navigate("/outcome"); // Redirect on successful registration
+      navigate("/"); // Redirect on successful registration
     } catch (error) {
       setErrorMessage(
         getArabicErrorMessage(error.message || "Registration failed.")
       );
     }
-  };
-
-  const isValidPassword = (password) => {
-    const hasNumber = /\d/; // This tests for a number
-    const hasLetter = /[a-zA-Z]/; // This tests for a letter
-    return (
-      password.length >= 6 &&
-      hasNumber.test(password) &&
-      hasLetter.test(password)
-    );
-  };
-
-  const extractEmailPrefix = (email) => {
-    return email.split("@")[0];
   };
 
   return (
