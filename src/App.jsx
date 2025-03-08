@@ -19,6 +19,7 @@ import Job from "./pages/Job";
 import { Breath, OrderComplete } from "./components";
 import Lesson from "./pages/Lesson";
 import Teach from "./pages/Teach";
+import Login from "./pages/Login";
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);
@@ -31,7 +32,6 @@ const App = () => {
         <Route path="/personality" element={<Personal />} />
         <Route path="/job" element={<Job />} />
         <Route path="/outcome" element={<Outcome />} />
-        <Route path="/signup" element={<SignUp />} />
         <Route path="/policy" element={<Policy />} />
         <Route path="/audio" element={<Audio />} />
         <Route path="/product/:category" element={<Product />} />
@@ -47,6 +47,7 @@ const App = () => {
           path="/signup"
           element={user ? <Navigate to="/" /> : <SignUp />}
         />
+        <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
       </Routes>
     </Router>
   );
