@@ -71,7 +71,7 @@ const Breath = () => {
       </ImageWrapper>
 
       <TextContent>
-        <SubTitle>تمكين الحياة من خلال المعرفة والابتكار</SubTitle>
+        <SubTitle>تمكين الابداع من خلال المعرفة والابتكار</SubTitle>
 
         <Paragraph>
           أنا طبيب ومبرمج اتجهت لإنشاء المحتوى كوسيلة لمساعدة الناس على التعلم
