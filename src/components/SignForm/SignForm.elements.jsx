@@ -43,13 +43,13 @@ export const LoginSignPara = styled.p`
 `;
 
 export const SignButton = styled.button`
-  background-color: #2946b6;
+  background-color: #ff7143;
   border-radius: 4px;
   width: 100%;
   height: 30px;
   border: 1px solid;
   margin-top: 10px;
-  border-color: #1a2d8a;
+  border-color: #ff7143;
   color: white;
   cursor: pointer;
 
