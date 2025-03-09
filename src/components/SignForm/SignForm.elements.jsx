@@ -49,7 +49,7 @@ export const SignButton = styled.button`
   height: 30px;
   border: 1px solid;
   margin-top: 10px;
-  border-color: #ff7143;
+  border-color: #ff5826;
   color: white;
   cursor: pointer;
 
