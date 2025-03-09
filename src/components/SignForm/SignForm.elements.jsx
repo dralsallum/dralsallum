@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const SignContainer = styled.div`
   background-color: #ffffff;
-  height: 100vh;
+  height: 70vh;
   display: flex;
   flex-direction: column;
   align-items: center;
