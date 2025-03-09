@@ -433,7 +433,7 @@ const Checkout = () => {
         <TitleRow>
           <CheckoutTitle>الدفع</CheckoutTitle>
           <LoginPrompt>
-            هل أنت عميلٌ سابق؟ <a href="#">انقر هنا لتسجيل الدخول</a>
+            هل أنت عميلٌ سابق؟ <Link to="/login">انقر هنا لتسجيل الدخول</Link>
           </LoginPrompt>
         </TitleRow>
 
