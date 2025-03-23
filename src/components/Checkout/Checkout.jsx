@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { useSelector, useDispatch } from "react-redux";
 import { removeProduct, clearCart } from "../../redux/cartRedux";
@@ -6,7 +6,6 @@ import Cross from "../../assets/crossFirst.png";
 import { publicRequest } from "../../requestMethods";
 import { Link } from "react-router-dom";
 
-/* Styled components remain the same */
 const PageContainer = styled.div`
   background: #edf4f7;
   margin: 20px 30px;
@@ -332,6 +331,14 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(""); // "uploading" or "processing"
 
+  // =============== NEW: Refs for each form field ===============
+  const emailRef = useRef(null);
+  const nameRef = useRef(null);
+  const cityRef = useRef(null);
+  const streetRef = useRef(null);
+  const termsRef = useRef(null);
+  // ============================================================
+
   // Remove a product from cart
   const handleRemove = (productId) => {
     dispatch(removeProduct(productId));
@@ -339,14 +346,45 @@ const Checkout = () => {
 
   // Validate the billing form and cart state
   const validateForm = () => {
-    if (!email || !name || !country || !city || !street) {
-      setErrorMessage("يرجى تعبئة جميع الحقول المطلوبة في معلومات الفوترة.");
+    // Check Email
+    if (!email) {
+      setErrorMessage("يرجى تعبئة حقل البريد الإلكتروني.");
+      emailRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
+    // Check Name
+    if (!name) {
+      setErrorMessage("يرجى تعبئة حقل الاسم الكامل.");
+      nameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }
+    // Check Country (already has a default but let's just be safe)
+    if (!country) {
+      setErrorMessage("يرجى اختيار الدولة.");
+      return false; // You could scroll to country if needed, but it's a select with a default
+    }
+    // Check City
+    if (!city) {
+      setErrorMessage("يرجى تعبئة حقل المدينة.");
+      cityRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }
+    // Check Street
+    if (!street) {
+      setErrorMessage("يرجى تعبئة حقل عنوان الشارع.");
+      streetRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      return false;
+    }
+    // Check Terms
     if (!termsAccepted) {
       setErrorMessage("يرجى الموافقة على الشروط والأحكام للمتابعة.");
+      termsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
+    // Check Cart
     if (cart.products.length === 0) {
       setErrorMessage("سلة التسوق فارغة. يرجى إضافة منتجات للمتابعة.");
       return false;
@@ -387,7 +425,7 @@ const Checkout = () => {
       // Submit order information
       const orderResponse = await publicRequest.post("/orders", orderData);
       if (orderResponse.data) {
-        // Success message removed as requested.
+        // Order submitted successfully
       }
     } catch (error) {
       console.error("Error submitting order:", error);
@@ -480,7 +518,8 @@ const Checkout = () => {
               <span>{"ر.س" + cart.total.toFixed(2)}</span>
             </TotalAmount>
 
-            <TermsCheckbox>
+            {/* Ref here for terms if you want to scroll on error */}
+            <TermsCheckbox ref={termsRef}>
               <label>
                 <input
                   type="checkbox"
@@ -513,6 +552,7 @@ const Checkout = () => {
               <FormField>
                 <label>البريد الإلكتروني *</label>
                 <input
+                  ref={emailRef} // attach ref
                   type="email"
                   placeholder="مثال: name@email.com"
                   value={email}
@@ -522,6 +562,7 @@ const Checkout = () => {
               <FormField>
                 <label>الاسم الكامل *</label>
                 <input
+                  ref={nameRef} // attach ref
                   type="text"
                   placeholder="الاسم الأول واسم العائلة"
                   value={name}
@@ -548,6 +589,7 @@ const Checkout = () => {
               <FormField>
                 <label>المدينة / البلدة *</label>
                 <input
+                  ref={cityRef} // attach ref
                   type="text"
                   placeholder="أدخل اسم المدينة"
                   value={city}
@@ -557,6 +599,7 @@ const Checkout = () => {
               <FormField>
                 <label>عنوان الشارع *</label>
                 <input
+                  ref={streetRef} // attach ref
                   type="text"
                   placeholder="أدخل عنوان الشارع"
                   value={street}
