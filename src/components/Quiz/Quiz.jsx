@@ -1,65 +1,9 @@
-import React, { useState } from "react";
+// Quiz.jsx
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-
-// Mock product data
-const mockProducts = [
-  {
-    _id: "1",
-    name: "Weight Management Formula",
-    price: 49.99,
-    oldPrice: 69.99,
-    category: "weight-management",
-    tags: ["weight", "metabolism"],
-    img: "https://via.placeholder.com/300x300/FF0000/FFFFFF?text=Weight+Mgmt",
-    brand: "Hims",
-    inStock: true,
-    discount: 28,
-  },
-  {
-    _id: "2",
-    name: "Metabolism Booster",
-    price: 39.99,
-    category: "fat-burner",
-    tags: ["metabolism", "energy", "weight"],
-    img: "https://via.placeholder.com/300x300/00FF00/FFFFFF?text=Metabolism",
-    brand: "Hims",
-    inStock: true,
-  },
-  {
-    _id: "3",
-    name: "Appetite Control Supplement",
-    price: 44.99,
-    oldPrice: 59.99,
-    category: "appetite-control",
-    tags: ["weight", "appetite"],
-    img: "https://via.placeholder.com/300x300/0000FF/FFFFFF?text=Appetite",
-    brand: "Hims",
-    inStock: true,
-    discount: 25,
-  },
-  {
-    _id: "4",
-    name: "Wellness Complete Bundle",
-    price: 89.99,
-    oldPrice: 119.99,
-    category: "bundle",
-    tags: ["weight", "metabolism", "energy"],
-    img: "https://via.placeholder.com/300x300/FF00FF/FFFFFF?text=Bundle",
-    brand: "Hims",
-    inStock: true,
-    discount: 25,
-  },
-  {
-    _id: "5",
-    name: "Energy & Focus Formula",
-    price: 34.99,
-    category: "energy",
-    tags: ["energy", "focus", "weight"],
-    img: "https://via.placeholder.com/300x300/FFFF00/000000?text=Energy",
-    brand: "Hims",
-    inStock: false,
-  },
-];
+import { publicRequest } from "../../requestMethods";
+import { useDispatch, useSelector } from "react-redux";
+import { addProduct } from "../../redux/cartRedux";
 
 // --- Styled Components ---
 const Container = styled.div`
@@ -76,12 +20,89 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
+const Navbar = styled.div`
+  width: 100%;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Ensures logo on left, basket on right */
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eaeaea;
+
+  @media (max-width: 768px) {
+    justify-content: space-between;
+  }
+`;
+
+/** A simpler "hims" logo for the navbar */
+const NavLogo = styled.div`
+  font-size: 24px;
+  color: #b67f5e;
+  font-weight: 700;
+  margin-left: 16px;
+
+  @media (max-width: 768px) {
+    margin: 0;
+  }
+`;
+
+/** Basket wrapper can shake with animation if 'shake' prop is true */
+const BasketWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  position: relative;
+
+  ${({ shake }) =>
+    shake &&
+    `
+    animation: shake 0.5s;
+    @keyframes shake {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      20% { transform: translate(-2px, 0) rotate(-2deg); }
+      40% { transform: translate(2px, 0) rotate(2deg); }
+      60% { transform: translate(-2px, 0) rotate(-2deg); }
+      80% { transform: translate(2px, 0) rotate(2deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+  `}
+`;
+
+const BasketIcon = styled.span`
+  margin-right: 8px;
+`;
+
+const CartCount = styled.span`
+  background: #b67f5e;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 14px;
+`;
+
+/** Small notification for "Product added to basket" feedback **/
+const Notification = styled.div`
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background-color: #333;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  z-index: 999;
+`;
+
 const Logo = styled.div`
   text-align: center;
   margin-bottom: 32px;
   font-size: 36px;
   color: #b67f5e;
   font-weight: 500;
+
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
 `;
 
 const ProgressBar = styled.div`
@@ -103,9 +124,8 @@ const ContentContainer = styled.div`
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: ${(props) => (props.centered ? "center" : "flex-start")};
   text-align: ${(props) => (props.centered ? "center" : "left")};
-  margin-bottom: 40px;
 `;
 
 const InfoHeader = styled.h1`
@@ -114,6 +134,10 @@ const InfoHeader = styled.h1`
   margin-bottom: 24px;
   color: #b67f5e;
   line-height: 1.2;
+
+  @media (max-width: 768px) {
+    font-size: 28px;
+  }
 `;
 
 const InfoSubheader = styled.h2`
@@ -122,6 +146,10 @@ const InfoSubheader = styled.h2`
   margin-bottom: 24px;
   color: #333;
   line-height: 1.4;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 const InfoText = styled.p`
@@ -226,7 +254,6 @@ const Disclaimer = styled.div`
   }
 `;
 
-// Quiz components
 const QuestionContainer = styled.div`
   margin-bottom: 40px;
 `;
@@ -266,6 +293,14 @@ const Option = styled.button`
   box-sizing: border-box;
   line-height: 1.5;
 
+  ${({ selected }) =>
+    selected &&
+    `
+    border-color: #b67f5e;
+    background-color: #fdfaf7;
+    box-shadow: 0 2px 8px rgba(182, 127, 94, 0.15);
+  `}
+
   &:hover {
     border-color: #b67f5e;
     background-color: #fdfaf7;
@@ -279,7 +314,6 @@ const Option = styled.button`
   }
 `;
 
-// Product components
 const ProductsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -377,7 +411,6 @@ const LoadingMessage = styled.div`
   color: #555;
 `;
 
-// Information cards for intermittent info screens
 const InfoCard = styled.div`
   background-color: white;
   border-radius: 12px;
@@ -413,33 +446,52 @@ const FactTitle = styled.div`
   color: #333;
 `;
 
+const Spinner = styled.div`
+  width: 40px;
+  height: 40px;
+  border: 4px solid #b67f5e;
+  border-top: 4px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
 // --- Main Component ---
 const Quiz = () => {
-  // States for controlling the flow
-  const [flowStep, setFlowStep] = useState("intro"); // intro, goalInfo, progressInfo, quiz, infoBreak, loading, results
+  // Flow states
+  const [flowStep, setFlowStep] = useState("intro");
   const [quizStep, setQuizStep] = useState(0);
   const [currentInfoBreak, setCurrentInfoBreak] = useState(0);
   const [answers, setAnswers] = useState({});
   const [products, setProducts] = useState([]);
-  const [basket, setBasket] = useState([]);
-
-  // For text-based questions, hold the user's typed input:
+  const [loading, setLoading] = useState(false);
   const [textInput, setTextInput] = useState("");
 
-  // 1) Your new quiz questions:
+  // NEW: local state for feedback notification AND basket shake
+  const [addedMessage, setAddedMessage] = useState("");
+  const [shakeBasket, setShakeBasket] = useState(false);
+
+  // Redux
+  const dispatch = useDispatch();
+  const cartQuantity = useSelector((state) => state.cart.quantity);
+
+  // Quiz questions array
   const questions = [
     {
       id: "sex",
-      question:
-        "What is your sex? (Answer format: Multiple choice – e.g., Male or Female)​",
+      question: "What is your sex?",
       type: "multiple",
       options: ["Male", "Female"],
-      source: "healthline.com",
     },
     {
       id: "pregnancy",
       question:
-        "If you are female, are you currently pregnant, breastfeeding, or planning to become pregnant? (Answer format: Multiple choice – asked only if applicable).",
+        "If you are female, are you currently pregnant, breastfeeding, or planning to become pregnant?",
       type: "multiple",
       options: [
         "Not applicable (I'm not female)",
@@ -448,36 +500,28 @@ const Quiz = () => {
         "Breastfeeding",
         "Planning pregnancy",
       ],
-      source: "",
     },
     {
       id: "location",
-      question:
-        "Where do you live? (Answer format: Enter location, e.g. ZIP code or country)​",
+      question: "Where do you live? (Enter location, e.g. ZIP code or country)",
       type: "text",
       options: [],
-      source: "dtcpatterns.com",
     },
     {
       id: "pastVitamins",
-      question:
-        "Have you ever taken vitamins or supplements in the past? (Answer format: Yes/No)​",
+      question: "Have you ever taken vitamins or supplements in the past?",
       type: "multiple",
       options: ["Yes", "No"],
-      source: "healthline.com",
     },
     {
       id: "currentSupplements",
-      question:
-        'How many vitamins or supplements do you currently take? (Answer format: Multiple choice – e.g., "None", "1–2", "3–5", "More than 5")​',
+      question: "How many vitamins or supplements do you currently take?",
       type: "multiple",
       options: ["None", "1–2", "3–5", "More than 5"],
-      source: "thecustomerdigest.com",
     },
     {
       id: "familiarity",
-      question:
-        "How familiar are you with vitamins and supplements? (Answer format: Multiple choice – self-assessment of knowledge level)​",
+      question: "How familiar are you with vitamins and supplements?",
       type: "multiple",
       options: [
         "Not familiar at all",
@@ -485,20 +529,17 @@ const Quiz = () => {
         "Moderately familiar",
         "Very familiar",
       ],
-      source: "thecustomerdigest.com",
     },
     {
       id: "powders",
       question:
-        "Do you use any supplemental powders (such as protein shakes or drink mixes)? (Answer format: Yes/No)​",
+        "Do you use any supplemental powders (such as protein shakes or drink mixes)?",
       type: "multiple",
       options: ["Yes", "No"],
-      source: "thecustomerdigest.com",
     },
     {
       id: "healthGoals",
-      question:
-        "What are your health goals or areas you’d like to focus on? (Answer format: Multiple selection – choose one or more: Immunity, Sleep, Stress, Energy, Fitness, Digestion, Skin, Heart health, Cognitive health, or Overall wellness)​",
+      question: "What are your health goals or areas you'd like to focus on?",
       type: "multiple",
       options: [
         "Immunity",
@@ -512,20 +553,17 @@ const Quiz = () => {
         "Cognitive health",
         "Overall wellness",
       ],
-      source: "dtcpatterns.com / healthline.com",
+      multiSelect: true,
     },
     {
       id: "exerciseFrequency",
-      question:
-        "How often do you exercise in a typical week? (Answer format: Multiple choice – e.g., 'Never', '1–2 times', '3–5 times', '6+ times')​",
+      question: "How often do you exercise in a typical week?",
       type: "multiple",
       options: ["Never", "1–2 times", "3–5 times", "6+ times"],
-      source: "thecustomerdigest.com",
     },
     {
       id: "exerciseTypes",
-      question:
-        "What types of exercise do you usually do? (Answer format: Multiple choice – select all that apply, e.g., cardio, strength training, yoga)​",
+      question: "What types of exercise do you usually do?",
       type: "multiple",
       options: [
         "Cardio",
@@ -534,60 +572,48 @@ const Quiz = () => {
         "High-intensity intervals",
         "Other / No exercise",
       ],
-      source: "thecustomerdigest.com",
+      multiSelect: true,
     },
     {
       id: "skinCondition",
-      question:
-        "How would you describe your skin’s condition? (e.g., is your skin often dry?) (Answer format: Multiple choice)​",
+      question: "How would you describe your skin's condition?",
       type: "multiple",
       options: ["Very dry", "Somewhat dry", "Neutral", "Well-hydrated"],
-      source: "thecustomerdigest.com / dtcpatterns.com",
     },
     {
       id: "stressLevel",
-      question:
-        "How would you rate your typical stress level? (Answer format: Multiple choice or scale – e.g., low, moderate, high)​",
+      question: "How would you rate your typical stress level?",
       type: "multiple",
       options: ["Low", "Moderate", "High"],
-      source: "dtcpatterns.com",
     },
     {
       id: "sleepHours",
-      question:
-        "How many hours of sleep do you usually get per night? (Answer format: Multiple choice – shown if sleep is a goal)​",
+      question: "How many hours of sleep do you usually get per night?",
       type: "multiple",
       options: ["<5 hours", "5-6 hours", "6-7 hours", "7-8 hours", "8+ hours"],
-      source: "",
     },
     {
       id: "energyLevels",
-      question:
-        "How would you describe your daily energy levels? (Answer format: Multiple choice – e.g., often tired, some ups and downs, generally energetic)​",
+      question: "How would you describe your daily energy levels?",
       type: "multiple",
       options: ["Often tired", "Some ups and downs", "Generally energetic"],
-      source: "",
     },
     {
       id: "digestiveDiscomfort",
       question:
-        "How often do you experience digestive discomfort (such as bloating or indigestion)? (Answer format: Multiple choice – rarely, sometimes, frequently)​",
+        "How often do you experience digestive discomfort (such as bloating or indigestion)?",
       type: "multiple",
       options: ["Rarely", "Sometimes", "Frequently"],
-      source: "",
     },
     {
       id: "getSick",
-      question:
-        "How often do you tend to get sick (e.g., colds in a year)? (Answer format: Multiple choice – e.g., rarely (0–1 times), sometimes (2–3), often (4+ per year))​",
+      question: "How often do you tend to get sick (e.g., colds in a year)?",
       type: "multiple",
       options: ["Rarely (0–1)", "Sometimes (2–3)", "Often (4+)"],
-      source: "",
     },
     {
       id: "heartConcerns",
-      question:
-        "Do you have any specific heart health concerns (like high blood pressure or high cholesterol)? (Answer format: Multiple choice)​",
+      question: "Do you have any specific heart health concerns?",
       type: "multiple",
       options: [
         "None",
@@ -595,44 +621,36 @@ const Quiz = () => {
         "High cholesterol",
         "Other heart concerns",
       ],
-      source: "",
     },
     {
       id: "focusMemory",
-      question:
-        "Do you experience difficulty with focus or memory? (Answer format: Multiple choice – e.g., Yes/No)​",
+      question: "Do you experience difficulty with focus or memory?",
       type: "multiple",
       options: ["Yes", "No"],
-      source: "",
     },
     {
       id: "fruitVeggies",
       question:
-        "How many servings of fruits and vegetables do you eat on most days? (Answer format: Multiple choice – select an approximate number)​",
+        "How many servings of fruits and vegetables do you eat on most days?",
       type: "multiple",
       options: ["0-1", "2-3", "4-5", "6+"],
-      source: "healthline.com",
     },
     {
       id: "fermentedFoods",
       question:
-        "How often do you eat fermented foods (such as yogurt, kombucha, or kimchi)? (Answer format: Multiple choice)​",
+        "How often do you eat fermented foods (such as yogurt, kombucha, or kimchi)?",
       type: "multiple",
       options: ["Daily", "A few times a week", "Rarely", "Never"],
-      source: "thecustomerdigest.com",
     },
     {
       id: "fiber",
-      question:
-        "Would you say you get enough fiber in your diet? (Answer format: Multiple choice – assess as low/adequate/high)​",
+      question: "Would you say you get enough fiber in your diet?",
       type: "multiple",
       options: ["Low", "Adequate", "High"],
-      source: "thecustomerdigest.com",
     },
     {
       id: "dietPattern",
-      question:
-        "Do you follow any particular diet or dietary pattern? (Answer format: Multiple selection – e.g., Vegan, Vegetarian, Paleo, Gluten-free/Celiac, None)​",
+      question: "Do you follow any particular diet or dietary pattern?",
       type: "multiple",
       options: [
         "None",
@@ -642,12 +660,10 @@ const Quiz = () => {
         "Gluten-free/Celiac",
         "Other",
       ],
-      source: "thecustomerdigest.com",
     },
     {
       id: "allergies",
-      question:
-        "Do you have any food allergies or sensitivities? (Answer format: Multiple selection – e.g., Dairy, Soy, Gluten, Shellfish, etc)​",
+      question: "Do you have any food allergies or sensitivities?",
       type: "multiple",
       options: [
         "None",
@@ -658,101 +674,162 @@ const Quiz = () => {
         "Ragweed",
         "Other",
       ],
-      source: "thecustomerdigest.com",
+      multiSelect: true,
     },
     {
       id: "smoke",
-      question: "Do you smoke? (Answer format: Yes/No)​",
+      question: "Do you smoke?",
       type: "multiple",
       options: ["Yes", "No"],
-      source: "healthline.com",
     },
   ];
 
-  // Info breaks: same logic
+  // Info break content
   const infoBreaks = [
     {
       title: "Your Metabolism & Weight",
-      content: (
-        <>
-          <InfoCardContent>
-            Your body composition and metabolism play crucial roles in weight
-            management. Research shows that metabolic rates can vary by up to
-            20% between individuals with similar characteristics.
-          </InfoCardContent>
-          <FactBox>
-            <FactTitle>Did you know?</FactTitle>
-            <p>
-              Building muscle through strength training can increase your
-              resting metabolic rate, helping you burn more calories even when
-              not exercising.
-            </p>
-          </FactBox>
-        </>
-      ),
+      content:
+        "Your body composition and metabolism play crucial roles in weight management. Research shows that metabolic rates can vary by up to 20% between individuals with similar characteristics.",
+      fact: "Building muscle through strength training can increase your resting metabolic rate, helping you burn more calories even when not exercising.",
     },
     {
       title: "Lifestyle Factors",
-      content: (
-        <>
-          <InfoCardContent>
-            Sleep quality and stress management are often overlooked in weight
-            loss journeys. Poor sleep can increase hunger hormones by up to 15%
-            and decrease the hormones that signal fullness.
-          </InfoCardContent>
-          <FactBox>
-            <FactTitle>Research insight</FactTitle>
-            <p>
-              Studies show that people who sleep less than 7 hours per night are
-              30% more likely to gain weight than those who get 7+ hours
-              regularly.
-            </p>
-          </FactBox>
-        </>
-      ),
+      content:
+        "Sleep quality and stress management are often overlooked in weight loss journeys. Poor sleep can increase hunger hormones by up to 15% and decrease the hormones that signal fullness.",
+      fact: "Studies show that people who sleep less than 7 hours per night are 30% more likely to gain weight than those who get 7+ hours regularly.",
     },
     {
       title: "Medical Considerations",
-      content: (
-        <>
-          <InfoCardContent>
-            Certain medical conditions can significantly impact your ability to
-            lose weight. Conditions like hypothyroidism can slow metabolism by
-            30% or more if untreated.
-          </InfoCardContent>
-          <FactBox>
-            <FactTitle>Important note</FactTitle>
-            <p>
-              Always consult with a healthcare provider before starting any
-              weight management program, especially if you have existing medical
-              conditions.
-            </p>
-          </FactBox>
-        </>
-      ),
+      content:
+        "Certain medical conditions can significantly impact your ability to lose weight. Conditions like hypothyroidism can slow metabolism by 30% or more if untreated.",
+      fact: "Always consult with a healthcare provider before starting any weight management program, especially if you have existing medical conditions.",
     },
     {
       title: "Behavior & Habits",
-      content: (
-        <>
-          <InfoCardContent>
-            Small behavioral changes can lead to significant results over time.
-            Replacing just one sugary drink per day with water can result in 10+
-            pounds of weight loss over a year.
-          </InfoCardContent>
-          <FactBox>
-            <FactTitle>Success strategies</FactTitle>
-            <p>
-              People who track their food intake consistently lose 2-3 times
-              more weight than those who don't monitor what they eat.
-            </p>
-          </FactBox>
-        </>
-      ),
+      content:
+        "Small behavioral changes can lead to significant results over time. Replacing just one sugary drink per day with water can result in 10+ pounds of weight loss over a year.",
+      fact: "People who track their food intake consistently lose 2-3 times more weight than those who don't monitor what they eat.",
     },
   ];
 
-  // Calculate progress percentage
+  // Enhanced recommendation logic
+  const getRecommendedProductIds = (userAnswers) => {
+    const recommendedIds = new Set();
+
+    // Immunity & Vitamin D
+    if (
+      userAnswers.healthGoals?.includes("Immunity") ||
+      userAnswers.getSick === "Often (4+)" ||
+      userAnswers.getSick === "Sometimes (2–3)"
+    ) {
+      recommendedIds.add("immune-support");
+      recommendedIds.add("vitd");
+    }
+
+    // Pregnancy & Overall wellness
+    if (
+      userAnswers.pregnancy === "Pregnant" ||
+      userAnswers.pregnancy === "Breastfeeding" ||
+      userAnswers.healthGoals?.includes("Overall wellness")
+    ) {
+      recommendedIds.add("prenatal");
+      recommendedIds.add("vitb12-complex");
+    }
+
+    // Energy & Focus
+    if (
+      userAnswers.energyLevels === "Often tired" ||
+      userAnswers.healthGoals?.includes("Energy") ||
+      userAnswers.focusMemory === "Yes" ||
+      userAnswers.healthGoals?.includes("Cognitive health")
+    ) {
+      recommendedIds.add("vitb12-1000");
+      recommendedIds.add("energy-complex");
+    }
+
+    // Digestive
+    if (
+      userAnswers.digestiveDiscomfort === "Frequently" ||
+      userAnswers.digestiveDiscomfort === "Sometimes" ||
+      userAnswers.healthGoals?.includes("Digestion") ||
+      userAnswers.fiber === "Low"
+    ) {
+      recommendedIds.add("probiotic");
+      recommendedIds.add("digestive-enzyme");
+    }
+
+    // Heart
+    if (
+      userAnswers.heartConcerns === "High blood pressure" ||
+      userAnswers.heartConcerns === "High cholesterol" ||
+      userAnswers.healthGoals?.includes("Heart health")
+    ) {
+      recommendedIds.add("omega3");
+      recommendedIds.add("coq10");
+    }
+
+    // Sleep
+    if (
+      userAnswers.sleepHours === "<5 hours" ||
+      userAnswers.sleepHours === "5-6 hours" ||
+      userAnswers.healthGoals?.includes("Sleep")
+    ) {
+      recommendedIds.add("melatonin");
+      recommendedIds.add("sleep-complex");
+    }
+
+    // Stress
+    if (
+      userAnswers.stressLevel === "High" ||
+      userAnswers.stressLevel === "Moderate" ||
+      userAnswers.healthGoals?.includes("Stress")
+    ) {
+      recommendedIds.add("stress-relief");
+      recommendedIds.add("ashwagandha");
+    }
+
+    // Fitness
+    if (
+      userAnswers.exerciseFrequency === "3–5 times" ||
+      userAnswers.exerciseFrequency === "6+ times" ||
+      userAnswers.healthGoals?.includes("Fitness") ||
+      userAnswers.exerciseTypes?.includes("Strength training")
+    ) {
+      recommendedIds.add("protein");
+      recommendedIds.add("bcaa");
+    }
+
+    // Skin
+    if (
+      userAnswers.skinCondition === "Very dry" ||
+      userAnswers.skinCondition === "Somewhat dry" ||
+      userAnswers.healthGoals?.includes("Skin")
+    ) {
+      recommendedIds.add("collagen");
+      recommendedIds.add("skin-complex");
+    }
+
+    // Special diets
+    if (
+      userAnswers.dietPattern === "Vegan" ||
+      userAnswers.dietPattern === "Vegetarian"
+    ) {
+      recommendedIds.add("vitb12-1000");
+      recommendedIds.add("iron");
+    }
+
+    // Default if none
+    if (recommendedIds.size === 0) {
+      recommendedIds.add("multivitamin");
+      recommendedIds.add("vitd");
+      recommendedIds.add("vitb12-complex");
+    }
+
+    // Limit to 4
+    return Array.from(recommendedIds).slice(0, 4);
+  };
+
+  // Progress percentage
   const getProgressPercentage = () => {
     const steps = [
       "intro",
@@ -764,10 +841,10 @@ const Quiz = () => {
     ];
     const currentIndex = steps.indexOf(flowStep);
 
+    // Quiz is ~60% of total
     if (flowStep === "quiz") {
-      // ~60% of overall progress for the quiz
       const quizPercentage = ((quizStep + 1) / questions.length) * 100 * 0.6;
-      return 30 + quizPercentage; // quiz starts at ~30%
+      return 30 + quizPercentage;
     }
 
     if (flowStep === "infoBreak") {
@@ -781,78 +858,149 @@ const Quiz = () => {
     return (currentIndex / (steps.length - 1)) * 100;
   };
 
-  // Get last question index before an info break
   const getLastQuestionIndexBeforeBreak = (breakIndex) => {
-    // Each info break after 3 questions
-    return (breakIndex + 1) * 3;
+    // Each info break after 6 questions
+    return (breakIndex + 1) * 6;
   };
 
-  // Show info break after every 3 questions (if breaks left)
-  const shouldShowInfoBreak = (currentStep) => {
-    const baseCondition =
-      (currentStep + 1) % 3 === 0 && currentStep < questions.length - 1;
-    return (
-      baseCondition && Math.floor(currentStep / 3) < infoBreaks.length // ensure we don't run out of breaks
-    );
+  const shouldShowInfoBreak = (step) => {
+    const baseCondition = (step + 1) % 6 === 0 && step < questions.length - 1;
+    return baseCondition && Math.floor(step / 6) < infoBreaks.length;
   };
 
-  // Go to next question or step
+  // Select option
   const handleSelectOption = (value) => {
     const currentQuestionId = questions[quizStep].id;
-    const updatedAnswers = { ...answers, [currentQuestionId]: value };
+    let newValue = value;
+
+    if (questions[quizStep].multiSelect) {
+      const currentAnswers = answers[currentQuestionId] || [];
+      if (currentAnswers.includes(value)) {
+        newValue = currentAnswers.filter((item) => item !== value);
+      } else {
+        newValue = [...currentAnswers, value];
+      }
+    }
+
+    const updatedAnswers = { ...answers, [currentQuestionId]: newValue };
     setAnswers(updatedAnswers);
+    setTextInput(""); // clear text
 
-    // Clear text input so it’s empty for next potential text question
-    setTextInput("");
-
-    // If last question answered, go to loading...
+    // Next step
     if (quizStep === questions.length - 1) {
       setFlowStep("loading");
-      // Simulate an API call
-      setTimeout(() => {
-        // Minimal product filtering example:
-        let filteredProducts = [...mockProducts];
-        // For instance, if user is "Male" -> pick only products w/ metabolism tag
-        if (updatedAnswers.sex === "Male") {
-          filteredProducts = filteredProducts.filter((p) =>
-            p.tags.includes("metabolism")
-          );
-          if (!filteredProducts.length) {
-            filteredProducts = [...mockProducts]; // fallback if none found
-          }
-        }
-        // Show top 3
-        filteredProducts = filteredProducts.slice(0, 3);
-        setProducts(filteredProducts);
-        setFlowStep("results");
-      }, 1200);
-    }
-    // else if we show an info break
-    else if (shouldShowInfoBreak(quizStep)) {
-      setCurrentInfoBreak(Math.floor(quizStep / 3));
+      fetchRecommendedProducts(updatedAnswers);
+    } else if (shouldShowInfoBreak(quizStep)) {
+      setCurrentInfoBreak(Math.floor(quizStep / 6));
       setFlowStep("infoBreak");
-    }
-    // otherwise move to next question
-    else {
+    } else {
       setQuizStep(quizStep + 1);
     }
   };
 
-  // Continue from info break back to quiz
+  // Continue after info break
   const handleContinueFromInfoBreak = () => {
     setQuizStep(quizStep + 1);
     setFlowStep("quiz");
   };
 
-  // Add product to basket
+  // "Add product" using Redux, plus show notification & basket shake
   const handleAddToBasket = (product) => {
-    setBasket((prevBasket) => [...prevBasket, product]);
-    alert(
-      `Added ${product.name} to your basket! Basket items: ${basket.length + 1}`
+    // Dispatch to redux cart
+    dispatch(
+      addProduct({
+        ...product,
+        quantity: 1, // default quantity
+      })
     );
+    // Show feedback
+    setAddedMessage(`Added "${product.name}" to your basket!`);
+    // Trigger basket shake
+    setShakeBasket(true);
+
+    // Hide message and stop shaking after a short delay
+    setTimeout(() => {
+      setAddedMessage("");
+      setShakeBasket(false);
+    }, 2500);
   };
 
-  // Render content
+  // Fetch recommended products
+  const fetchRecommendedProducts = async (userAnswers) => {
+    setLoading(true);
+    try {
+      const recommendedIds = getRecommendedProductIds(userAnswers);
+      console.log("Recommended product IDs:", recommendedIds);
+
+      // Simulate small delay
+      setTimeout(async () => {
+        try {
+          const productPromises = recommendedIds.map((id) =>
+            publicRequest
+              .get(`/products/find/${id}`)
+              .then((res) => res.data)
+              .catch((err) => {
+                console.error(`Error fetching product ${id}:`, err);
+                return null;
+              })
+          );
+
+          const results = await Promise.all(productPromises);
+          const validProducts = results.filter((p) => p !== null);
+
+          setProducts(validProducts);
+          setLoading(false);
+          setFlowStep("results");
+        } catch (error) {
+          console.error("Error fetching products:", error);
+          setLoading(false);
+          setFlowStep("results");
+        }
+      }, 1500);
+    } catch (err) {
+      console.error("Error in recommendation logic:", err);
+      setLoading(false);
+      setFlowStep("results");
+    }
+  };
+
+  // Fallback products
+  const fallbackProducts = [
+    {
+      _id: "vitd",
+      name: "Vitamin D3 (5000 IU)",
+      price: 19.99,
+      img: "https://via.placeholder.com/150",
+      inStock: true,
+      category: "vitamins",
+      quantity: 1,
+    },
+    {
+      _id: "vitb12-complex",
+      name: "Vitamin B Complex",
+      price: 24.99,
+      img: "https://via.placeholder.com/150",
+      inStock: true,
+      category: "vitamins",
+      quantity: 1,
+    },
+    {
+      _id: "multivitamin",
+      name: "Daily Multivitamin",
+      price: 29.99,
+      img: "https://via.placeholder.com/150",
+      inStock: true,
+      category: "vitamins",
+      quantity: 1,
+    },
+  ];
+
+  useEffect(() => {
+    if (flowStep === "results" && products.length === 0) {
+      setProducts(fallbackProducts);
+    }
+  }, [flowStep, products]);
+
   const renderContent = () => {
     switch (flowStep) {
       case "intro":
@@ -891,27 +1039,19 @@ const Quiz = () => {
                 To find a custom plan for you, we'll need to build your Weight
                 Loss Profile first.
               </InfoSubheader>
-              <div style={{ marginTop: "40px" }}>
-                <InfoHeader style={{ fontSize: "28px" }}>Ready?</InfoHeader>
-              </div>
+              <InfoHeader style={{ fontSize: "28px", marginTop: "40px" }}>
+                Ready?
+              </InfoHeader>
             </ContentContainer>
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <Button onClick={() => setFlowStep("progressInfo")}>
-                Next
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </Button>
-            </div>
+            <Button onClick={() => setFlowStep("progressInfo")}>
+              Next
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </Button>
           </>
         );
 
@@ -925,35 +1065,23 @@ const Quiz = () => {
                   On average, people lost 15-20% of their body weight in a
                   68-week clinical trial study of Wegovy®*
                 </p>
-                <ChartImage>
-                  <TimeMarker position="10%">1mo</TimeMarker>
-                  <TimeMarker position="50%">6mo</TimeMarker>
-                  <WeightGoal>Goal weight</WeightGoal>
-                </ChartImage>
+                <ChartImage>{/* Visualization placeholder */}</ChartImage>
               </Chart>
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <Button onClick={() => setFlowStep("quiz")}>
-                  Next
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </Button>
-              </div>
+              <Button onClick={() => setFlowStep("quiz")}>
+                Next
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path
+                    d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </Button>
             </ContentContainer>
           </>
         );
 
-      case "quiz":
-        const currentQuestionData = questions[quizStep];
+      case "quiz": {
+        const currentQuestion = questions[quizStep];
         return (
           <>
             <Logo>hims</Logo>
@@ -961,26 +1089,35 @@ const Quiz = () => {
               <QuestionNumber>
                 Question {quizStep + 1} of {questions.length}
               </QuestionNumber>
-              <Question>{currentQuestionData.question}</Question>
+              <Question>{currentQuestion.question}</Question>
 
-              {/* If it's multiple-choice */}
-              {currentQuestionData.type === "multiple" &&
-                currentQuestionData.options.length > 0 && (
+              {/* Multiple-choice */}
+              {currentQuestion.type === "multiple" &&
+                currentQuestion.options.length > 0 && (
                   <OptionsContainer>
-                    {currentQuestionData.options.map((option) => (
-                      <Option
-                        key={option}
-                        onClick={() => handleSelectOption(option)}
-                      >
-                        {option}
-                      </Option>
-                    ))}
+                    {currentQuestion.options.map((option) => {
+                      const isSelected =
+                        currentQuestion.multiSelect &&
+                        Array.isArray(answers[currentQuestion.id]) &&
+                        answers[currentQuestion.id].includes(option);
+
+                      return (
+                        <Option
+                          key={option}
+                          onClick={() => handleSelectOption(option)}
+                          selected={isSelected}
+                        >
+                          {option}
+                          {isSelected && " ✓"}
+                        </Option>
+                      );
+                    })}
                   </OptionsContainer>
                 )}
 
-              {/* If it's text-based, show input + Continue button */}
-              {currentQuestionData.type === "text" && (
-                <div style={{ textAlign: "center", marginTop: "20px" }}>
+              {/* Text-based */}
+              {currentQuestion.type === "text" && (
+                <ContentContainer centered style={{ marginTop: "20px" }}>
                   <input
                     type="text"
                     placeholder="Type your answer..."
@@ -994,21 +1131,45 @@ const Quiz = () => {
                     value={textInput}
                     onChange={(e) => setTextInput(e.target.value)}
                   />
-                  <br />
                   <Button
-                    // (Optional) disable if empty
                     disabled={!textInput.trim()}
                     onClick={() => handleSelectOption(textInput.trim())}
                   >
                     Continue
                   </Button>
-                </div>
+                </ContentContainer>
+              )}
+
+              {/* Multi-select "Continue" */}
+              {currentQuestion.multiSelect && (
+                <ContentContainer centered style={{ marginTop: "20px" }}>
+                  <Button
+                    onClick={() => {
+                      if (!answers[currentQuestion.id]) {
+                        handleSelectOption([]);
+                      } else {
+                        if (quizStep === questions.length - 1) {
+                          setFlowStep("loading");
+                          fetchRecommendedProducts(answers);
+                        } else if (shouldShowInfoBreak(quizStep)) {
+                          setCurrentInfoBreak(Math.floor(quizStep / 6));
+                          setFlowStep("infoBreak");
+                        } else {
+                          setQuizStep(quizStep + 1);
+                        }
+                      }
+                    }}
+                  >
+                    Continue
+                  </Button>
+                </ContentContainer>
               )}
             </QuestionContainer>
           </>
         );
+      }
 
-      case "infoBreak":
+      case "infoBreak": {
         const currentBreak = infoBreaks[currentInfoBreak];
         return (
           <>
@@ -1021,42 +1182,32 @@ const Quiz = () => {
                 Thanks for sharing those details. Let's look at how they factor
                 into your weight management journey.
               </InfoSubheader>
-
               <InfoCard>
                 <InfoCardTitle>{currentBreak.title}</InfoCardTitle>
-                {currentBreak.content}
+                <InfoCardContent>
+                  <p>{currentBreak.content}</p>
+                  <FactBox>
+                    <FactTitle>Did you know?</FactTitle>
+                    <p>{currentBreak.fact}</p>
+                  </FactBox>
+                </InfoCardContent>
               </InfoCard>
-
               <InfoText>
                 Just a few more questions to complete your personalized profile.
               </InfoText>
-
-              <div
-                style={{
-                  marginTop: "30px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <Button onClick={handleContinueFromInfoBreak}>
-                  Continue
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </Button>
-              </div>
+              <Button onClick={handleContinueFromInfoBreak}>
+                Continue
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path
+                    d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </Button>
             </ContentContainer>
           </>
         );
+      }
 
       case "loading":
         return (
@@ -1067,41 +1218,7 @@ const Quiz = () => {
                 Analyzing your responses and building your weight management
                 profile...
               </LoadingMessage>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  marginTop: "20px",
-                }}
-              >
-                <svg
-                  width="40"
-                  height="40"
-                  viewBox="0 0 50 50"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle
-                    cx="25"
-                    cy="25"
-                    r="20"
-                    fill="none"
-                    stroke="#b67f5e"
-                    strokeWidth="5"
-                    strokeLinecap="round"
-                    strokeDasharray="94.2477796077"
-                    strokeDashoffset="47.1238898038"
-                  >
-                    <animateTransform
-                      attributeName="transform"
-                      type="rotate"
-                      from="0 25 25"
-                      to="360 25 25"
-                      dur="1s"
-                      repeatCount="indefinite"
-                    />
-                  </circle>
-                </svg>
-              </div>
+              <Spinner />
             </ContentContainer>
           </>
         );
@@ -1122,47 +1239,61 @@ const Quiz = () => {
                 Each product addresses different aspects of weight management,
                 from appetite control to metabolism support.
               </InfoText>
+
               <ProductsContainer>
-                {products.map((product) => (
-                  <ProductCard key={product._id}>
-                    <ProductImage src={product.img} alt={product.name} />
-                    <ProductName>{product.name}</ProductName>
-                    <ProductPrice>
-                      ${product.price.toFixed(2)}
-                      {product.oldPrice && (
-                        <>
-                          <OriginalPrice>
-                            ${product.oldPrice.toFixed(2)}
-                          </OriginalPrice>
-                          {product.discount && (
-                            <DiscountTag>{product.discount}% OFF</DiscountTag>
-                          )}
-                        </>
-                      )}
-                    </ProductPrice>
-                    <AddButton
-                      onClick={() => handleAddToBasket(product)}
-                      disabled={!product.inStock}
-                    >
-                      {product.inStock ? "Add to Basket" : "Out of Stock"}
-                    </AddButton>
-                  </ProductCard>
-                ))}
+                {products.length > 0 ? (
+                  products.map((product) => (
+                    <ProductCard key={product._id}>
+                      <ProductImage
+                        src={product.img || "https://via.placeholder.com/150"}
+                        alt={product.name}
+                      />
+                      <ProductName>{product.name}</ProductName>
+                      <ProductPrice>
+                        ${product.price?.toFixed(2)}
+                        {product.oldPrice && (
+                          <>
+                            <OriginalPrice>
+                              ${product.oldPrice.toFixed(2)}
+                            </OriginalPrice>
+                            {product.discount && (
+                              <DiscountTag>{product.discount}% OFF</DiscountTag>
+                            )}
+                          </>
+                        )}
+                      </ProductPrice>
+                      <AddButton
+                        onClick={() => handleAddToBasket(product)}
+                        disabled={!product.inStock}
+                      >
+                        {product.inStock ? "Add to Basket" : "Out of Stock"}
+                      </AddButton>
+                    </ProductCard>
+                  ))
+                ) : (
+                  <p>
+                    No products matched your profile. Try adjusting your
+                    answers.
+                  </p>
+                )}
               </ProductsContainer>
-              <div style={{ marginTop: "40px" }}>
+
+              <div style={{ marginTop: "40px", textAlign: "center" }}>
                 <InfoText>
                   Want to explore more options? Check out our full catalog for
                   additional weight management solutions.
                 </InfoText>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "20px",
-                    marginTop: "20px",
-                  }}
-                >
-                  <Button secondary onClick={() => setFlowStep("intro")}>
+                <div style={{ marginTop: "20px" }}>
+                  <Button
+                    secondary
+                    style={{ marginRight: "20px" }}
+                    onClick={() => {
+                      setFlowStep("intro");
+                      setQuizStep(0);
+                      setAnswers({});
+                      setProducts([]);
+                    }}
+                  >
                     Restart Quiz
                   </Button>
                   <Button onClick={() => (window.location.href = "/catalog")}>
@@ -1170,7 +1301,8 @@ const Quiz = () => {
                   </Button>
                 </div>
               </div>
-              <Disclaimer>
+
+              <Disclaimer style={{ marginTop: "40px" }}>
                 *Individual results may vary. Products have not been evaluated
                 by the FDA and are not intended to diagnose, treat, cure, or
                 prevent any disease. Please consult with a healthcare
@@ -1186,12 +1318,33 @@ const Quiz = () => {
   };
 
   return (
-    <Container>
-      <ProgressBar>
-        <Progress progress={getProgressPercentage()} />
-      </ProgressBar>
-      {renderContent()}
-    </Container>
+    <>
+      {/* Navbar at the very top, showing the basket quantity and a logo */}
+      <Navbar>
+        <NavLogo>hims</NavLogo>
+        <BasketWrapper
+          shake={shakeBasket}
+          onClick={() => {
+            // Takes user to /outcome
+            window.location.href = "/outcome";
+          }}
+        >
+          <BasketIcon>🛒</BasketIcon>
+          <CartCount>{cartQuantity}</CartCount>
+        </BasketWrapper>
+      </Navbar>
+
+      <Container>
+        <ProgressBar>
+          <Progress progress={getProgressPercentage()} />
+        </ProgressBar>
+
+        {/** If we have a product added message, show it */}
+        {addedMessage && <Notification>{addedMessage}</Notification>}
+
+        {renderContent()}
+      </Container>
+    </>
   );
 };
 

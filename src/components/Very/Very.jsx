@@ -14,6 +14,7 @@ import {
 } from "./Very.elements";
 
 import ArticleIcon from "@mui/icons-material/Article";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -34,10 +35,12 @@ const Header = () => {
             تبدأ زيارتك المجانية عبر الإنترنت هنا. أخبرنا <br /> بما يمكننا
             مساعدتك فيه.
           </HeaderSubHeader>
-          <HeaderSearch>
-            <HeaderSearchInput>خذ الكويز الان</HeaderSearchInput>
-            <ArticleIcon style={{ color: "white", fontSize: 25 }} />
-          </HeaderSearch>
+          <Link to="/Exam" style={{ textDecoration: "none", color: "inherit" }}>
+            <HeaderSearch>
+              <HeaderSearchInput>خذ الكويز الان</HeaderSearchInput>
+              <ArticleIcon style={{ color: "white", fontSize: 25 }} />
+            </HeaderSearch>
+          </Link>
         </HeaderContainerRight>
       </HeaderContainer>
     </HeaderWrapper>
