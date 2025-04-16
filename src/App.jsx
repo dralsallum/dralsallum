@@ -11,7 +11,6 @@ import { useSelector } from "react-redux";
 import Product from "./pages/Product";
 import SignUp from "./pages/SignUp";
 import Something from "./pages/Something";
-import Exam from "./pages/Exam";
 import Policy from "./pages/Policy";
 import Personal from "./pages/personal";
 import Audio from "./pages/Audio";
@@ -34,7 +33,6 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/personality" element={<Personal />} />
         <Route path="/job" element={<Job />} />
-        <Route path="/exam" element={<Exam />} />
         <Route path="/outcome" element={<Outcome />} />
         <Route path="/policy" element={<Policy />} />
         <Route path="/audio" element={<Audio />} />

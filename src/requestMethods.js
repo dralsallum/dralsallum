@@ -2,7 +2,7 @@
 
 import axios from "axios";
 
-const BASE_URL = "https://himapi-be94b8ecf4ab.herokuapp.com/api";
+const BASE_URL = "https://dralsallumapi-8efe1bd8f8df.herokuapp.com/api";
 
 // Retrieve token from localStorage if needed
 const user = JSON.parse(localStorage.getItem("persist:root"))?.user;

@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import { About, Banner, Body, Footer, NavTech, Slider } from "../components";
-import Header from "../components/Very/Very";
+import { Article, Footer, Last, Very } from "../components";
 
 const Home = () => {
   useEffect(() => {
@@ -8,12 +7,9 @@ const Home = () => {
   }, []);
   return (
     <>
-      <Banner />
-      <NavTech />
-      <Header />
-      <Slider />
-      <Body />
-      <About />
+      <Very />
+      <Last />
+      <Article />
       <Footer />
     </>
   );
