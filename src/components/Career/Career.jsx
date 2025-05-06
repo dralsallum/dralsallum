@@ -289,7 +289,7 @@ const VideoPlayer = () => {
         muted={isMuted}
       >
         <source
-          src="https://alsallum.s3.eu-north-1.amazonaws.com/fluentfox_ad.mp4"
+          src="https://alsallum.s3.eu-north-1.amazonaws.com/how_to_study_intro.mp4"
           type="video/mp4"
         />
         متصفحك لا يدعم تشغيل الفيديو.
