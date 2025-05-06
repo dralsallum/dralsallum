@@ -103,7 +103,8 @@ const ThumbnailOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("THUMBNAIL_URL") center center / cover no-repeat;
+  background: url("https://alsallum.s3.eu-north-1.amazonaws.com/course_thumbnail.jpg")
+    center center / cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -197,6 +198,7 @@ const VideoPlayer = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+  const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
 
   const videoRef = useRef(null);
 
@@ -233,6 +235,7 @@ const VideoPlayer = () => {
     } else {
       videoRef.current.play();
       setIsPlaying(true);
+      setHasStartedPlaying(true);
     }
   };
 
@@ -268,7 +271,11 @@ const VideoPlayer = () => {
     const videoElement = videoRef.current;
     if (videoElement) {
       const handlePause = () => setIsPlaying(false);
-      const handleEnded = () => setIsPlaying(false);
+      const handleEnded = () => {
+        setIsPlaying(false);
+        setCurrentTime(0);
+        setHasStartedPlaying(false);
+      };
 
       videoElement.addEventListener("pause", handlePause);
       videoElement.addEventListener("ended", handleEnded);
@@ -296,7 +303,7 @@ const VideoPlayer = () => {
       </StyledVideo>
 
       {/* Overlay thumbnail with big play button (only before first playback) */}
-      {!isPlaying && currentTime === 0 && (
+      {!hasStartedPlaying && (
         <ThumbnailOverlay onClick={handleThumbnailClick}>
           <BigPlayButton>▶</BigPlayButton>
         </ThumbnailOverlay>
