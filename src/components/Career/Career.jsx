@@ -95,6 +95,10 @@ const StyledVideo = styled.video`
   width: 100%;
   height: 100%;
   outline: none;
+  /* Prevent iOS from using native fullscreen */
+  playsinline: true;
+  webkit-playsinline: true;
+  x-webkit-airplay: "allow";
 `;
 
 const ThumbnailOverlay = styled.div`
@@ -294,6 +298,8 @@ const VideoPlayer = () => {
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         muted={isMuted}
+        playsInline
+        webkit-playsinline="true"
       >
         <source
           src="https://alsallum.s3.eu-north-1.amazonaws.com/how_to_study_intro.mp4"
