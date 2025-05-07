@@ -56,7 +56,7 @@ const NavLinkStyled = styled(Link)`
   }
 `;
 
-const SubscribeButton = styled.button`
+const SubscribeButton = styled(Link)`
   background: #ff7143;
   color: #fff;
   padding: 0.6rem 1.2rem;
@@ -151,7 +151,9 @@ const NavTech = () => {
           </NavLinkStyled>
         </NavLinks>
 
-        <SubscribeButton>انضم إلى أكثر من 260 ألف مشترك</SubscribeButton>
+        <SubscribeButton to="/login">
+          انضم إلى أكثر من 260 ألف مشترك
+        </SubscribeButton>
         <MenuButton onClick={toggleMenu}>☰</MenuButton>
       </Header>
 
