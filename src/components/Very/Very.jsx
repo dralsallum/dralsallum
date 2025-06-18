@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import styled, { keyframes } from "styled-components";
 import Charcter from "../../assets/hero-saud.png";
 import Avatar from "../../assets/Avatars.png";
 import Plan from "../../assets/plane.png";
 import NavTech from "../NavTech/NavTech";
 import { publicRequest } from "../../requestMethods";
+import { signOut } from "../../redux/userRedux";
 
 // -------------------------
 // Loading Bar Animation
@@ -231,10 +233,47 @@ const NewsletterDescription = styled.p`
   text-align: right;
 `;
 
+// -------------------------
+// Updated SubscriberCount with Sign Out Button
+// -------------------------
+const SubscriberSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+`;
+
 const SubscriberCount = styled.p`
   color: #666;
   font-size: 0.9rem;
   text-align: right;
+  margin: 0;
+`;
+
+const SignOutButton = styled.button`
+  padding: 0.5rem 1rem;
+  border: 1px solid #87ceeb;
+  border-radius: 1rem;
+  background: transparent;
+  color: #87ceeb;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #87ceeb;
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
 `;
 
 const EmailInput = styled.input`
@@ -283,6 +322,9 @@ const PrivacyText = styled.p`
 `;
 
 const Very = () => {
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector((state) => state.user);
+
   // State to hold the email input
   const [email, setEmail] = useState("");
   // Loading and Success states
@@ -316,6 +358,11 @@ const Very = () => {
     }
   };
 
+  // Handler function for sign out
+  const handleSignOut = () => {
+    dispatch(signOut());
+  };
+
   return (
     <ContainerAll>
       <NavTech />
@@ -338,9 +385,17 @@ const Very = () => {
             <NewsletterTitle>
               اشترك في لايف نوتس <PlanIcon src={Plan} alt="Plan Icon" />
             </NewsletterTitle>
-            <SubscriberCount>
-              انضم إلى مجتمع متنامٍ يضم أكثر من 260,000 قارئ
-            </SubscriberCount>
+
+            <SubscriberSection>
+              <SubscriberCount>
+                انضم إلى مجتمع متنامٍ يضم أكثر من 260,000 قارئ
+              </SubscriberCount>
+              {currentUser && (
+                <SignOutButton onClick={handleSignOut}>
+                  تسجيل خروج
+                </SignOutButton>
+              )}
+            </SubscriberSection>
 
             <ReviewSection>
               <ReviewImages>

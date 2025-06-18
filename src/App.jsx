@@ -40,22 +40,8 @@ const App = () => {
         <Route path="/main/:articleTitle" element={<Something />} />
 
         {/* Protected Routes that require login and paid subscription */}
-        <Route
-          path="/lesson"
-          element={
-            <ProtectedRoute requirePaid={true}>
-              <Lesson />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/learning/:slug"
-          element={
-            <ProtectedRoute requirePaid={true}>
-              <Teach />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/lesson" element={<Lesson />} />
+        <Route path="/learning/:slug" element={<Teach />} />
 
         <Route path="/order-complete" element={<OrderComplete />} />
 
