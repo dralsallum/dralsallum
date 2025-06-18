@@ -319,8 +319,6 @@ const ButtonContainer = styled.div`
 const Checkout = () => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
-
-  // Local state for billing info, messages, and loading/step tracking
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [country, setCountry] = useState("المملكة العربية السعودية");

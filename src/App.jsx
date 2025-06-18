@@ -37,8 +37,6 @@ const App = () => {
         <Route path="/policy" element={<Policy />} />
         <Route path="/audio" element={<Audio />} />
         <Route path="/product/:category" element={<Product />} />
-
-        {/* UPDATED ROUTE: capture article title as a URL parameter */}
         <Route path="/main/:articleTitle" element={<Something />} />
 
         {/* Protected Routes that require login and paid subscription */}
