@@ -40,12 +40,25 @@ const App = () => {
         <Route path="/main/:articleTitle" element={<Something />} />
 
         {/* Protected Routes that require login and paid subscription */}
-        <Route path="/lesson" element={<Lesson />} />
-        <Route path="/learning/:slug" element={<Teach />} />
+        <Route
+          path="/lesson"
+          element={
+            <ProtectedRoute requirePaid={true}>
+              <Lesson />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/learning/:slug"
+          element={
+            <ProtectedRoute requirePaid={true}>
+              <Teach />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="/order-complete" element={<OrderComplete />} />
 
-        {/* If user is logged in, redirect from signup to home */}
         <Route
           path="/signup"
           element={user ? <Navigate to="/" /> : <SignUp />}
