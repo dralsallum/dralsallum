@@ -458,6 +458,19 @@ const Money = () => {
     dispatch(removeProduct(productId));
   };
 
+  // Handle file selection and preview
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setReceiptFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setReceiptPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Validate form + receipt
   const validateForm = () => {
     if (!email) {
@@ -505,6 +518,86 @@ const Money = () => {
     return true;
   };
 
+  // Send email notification
+  const sendEmailNotification = async (orderData, orderId) => {
+    try {
+      const emailData = {
+        to: "draalsallum@gmail.com",
+        subject: `طلب جديد - رقم الطلب: ${orderId}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; direction: rtl; text-align: right;">
+            <h2 style="color: #ff7143;">طلب جديد تم استلامه</h2>
+            <hr style="border: 1px solid #ff7143;" />
+            
+            <h3>تفاصيل الطلب:</h3>
+            <p><strong>رقم الطلب:</strong> ${orderId}</p>
+            <p><strong>التاريخ:</strong> ${new Date().toLocaleDateString(
+              "ar-SA"
+            )}</p>
+            <p><strong>الوقت:</strong> ${new Date().toLocaleTimeString(
+              "ar-SA"
+            )}</p>
+            
+            <h3>معلومات العميل:</h3>
+            <p><strong>الاسم:</strong> ${orderData.address.name}</p>
+            <p><strong>البريد الإلكتروني:</strong> ${
+              orderData.address.email
+            }</p>
+            <p><strong>الدولة:</strong> ${orderData.address.country}</p>
+            <p><strong>المدينة:</strong> ${orderData.address.city}</p>
+            <p><strong>العنوان:</strong> ${orderData.address.street}</p>
+            
+            <h3>المنتجات المطلوبة:</h3>
+            <ul>
+              ${orderData.products
+                .map((product) => {
+                  const cartProduct = cart.products.find(
+                    (p) => p._id === product.productId
+                  );
+                  return `
+                  <li>
+                    <strong>${
+                      cartProduct?.title || "منتج غير معروف"
+                    }</strong> - 
+                    الكمية: ${product.quantity} - 
+                    السعر: ${cartProduct?.price || 0} ر.س
+                  </li>
+                `;
+                })
+                .join("")}
+            </ul>
+            
+            <h3>ملخص الطلب:</h3>
+            <p><strong>المجموع الكلي:</strong> ${orderData.amount.toFixed(
+              2
+            )} ر.س</p>
+            <p><strong>حالة الطلب:</strong> في انتظار التأكيد</p>
+            
+            <hr style="border: 1px solid #ff7143;" />
+            <p style="color: #666; font-size: 0.9rem;">
+              تم إرسال هذا الإشعار تلقائياً من نظام الطلبات الخاص بك.
+            </p>
+          </div>
+        `,
+        text: `
+          طلب جديد تم استلامه
+          
+          رقم الطلب: ${orderId}
+          اسم العميل: ${orderData.address.name}
+          البريد الإلكتروني: ${orderData.address.email}
+          المجموع الكلي: ${orderData.amount.toFixed(2)} ر.س
+          
+          يرجى مراجعة لوحة التحكم لمزيد من التفاصيل.
+        `,
+      };
+
+      await publicRequest.post("/orders/send-email", emailData);
+    } catch (error) {
+      console.error("Error sending email notification:", error);
+      // Don't throw error here as we don't want to stop the order process
+    }
+  };
+
   // Handle checkout & receipt upload
   const handleCheckout = async () => {
     if (!validateForm()) return;
@@ -532,7 +625,10 @@ const Money = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // 3) Clear cart & navigate to success
+      // 3) Send email notification
+      await sendEmailNotification(orderData, orderId);
+
+      // 4) Clear cart & navigate to success
       dispatch(clearCart());
       navigate("/payment-success");
     } catch (err) {
@@ -704,7 +800,7 @@ const Money = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setReceiptFile(e.target.files[0])}
+                  onChange={handleFileChange}
                 />
                 {receiptPreview && (
                   <UploadPreview>
