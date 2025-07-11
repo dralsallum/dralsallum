@@ -69,6 +69,13 @@ const ErrorMessage = styled.p`
   margin-bottom: -1rem;
 `;
 
+const SuccessMessage = styled.p`
+  color: green;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: -1rem;
+`;
+
 const CheckoutContent = styled.div`
   display: flex;
   align-items: flex-start;
@@ -96,6 +103,7 @@ const BillingInfo = styled.div`
   border-radius: 8px;
   padding: 2rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
   @media (max-width: 768px) {
     padding: 1rem;
   }
@@ -108,6 +116,52 @@ const BillingTitle = styled.h2`
   @media (max-width: 768px) {
     font-size: 1.1rem;
     margin-bottom: 1rem;
+  }
+`;
+
+const PaymentInfo = styled.div`
+  background: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
+const PaymentTitle = styled.h2`
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+`;
+
+const BankDetails = styled.div`
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e9ecef;
+
+  h3 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+
+  p {
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-size: 0.95rem;
+
+    strong {
+      color: #333;
+      margin-left: 0.5rem;
+    }
   }
 `;
 
@@ -137,6 +191,65 @@ const FormField = styled.div`
       font-size: 0.95rem;
       padding: 0.65rem;
     }
+  }
+`;
+
+const FileUploadField = styled.div`
+  margin-bottom: 1.5rem;
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
+
+  label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #444;
+    @media (max-width: 768px) {
+      font-size: 0.95rem;
+    }
+  }
+
+  input[type="file"] {
+    width: 100%;
+    border: 2px dashed #ccc;
+    border-radius: 6px;
+    padding: 1rem;
+    font-size: 1rem;
+    color: #333;
+    background: #f8f9fa;
+    cursor: pointer;
+
+    &:hover {
+      border-color: #ff7143;
+      background: #fff;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 0.95rem;
+      padding: 0.75rem;
+    }
+  }
+`;
+
+const UploadPreview = styled.div`
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+
+  img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
   }
 `;
 
@@ -262,7 +375,7 @@ const TotalAmount = styled.div`
   }
 `;
 
-const BuyNowButton = styled.button`
+const SubmitButton = styled.button`
   background: #ff7143;
   color: #fff;
   border: none;
@@ -316,7 +429,7 @@ const ButtonContainer = styled.div`
   }
 `;
 
-const Checkout = () => {
+const Money = () => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
   const [email, setEmail] = useState("");
@@ -325,50 +438,47 @@ const Checkout = () => {
   const [city, setCity] = useState("");
   const [street, setStreet] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [receiptFile, setReceiptFile] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(""); // "uploading" or "processing"
+  const [receiptPreview, setReceiptPreview] = useState(null);
+
   const navigate = useNavigate();
 
-  // =============== NEW: Refs for each form field ===============
+  // Refs
   const emailRef = useRef(null);
   const nameRef = useRef(null);
   const cityRef = useRef(null);
   const streetRef = useRef(null);
   const termsRef = useRef(null);
-  // ============================================================
+  const fileRef = useRef(null);
 
-  // Remove a product from cart
+  // Remove product
   const handleRemove = (productId) => {
     dispatch(removeProduct(productId));
   };
 
-  // Validate the billing form and cart state
+  // Validate form + receipt
   const validateForm = () => {
-    // Check Email
     if (!email) {
       setErrorMessage("يرجى تعبئة حقل البريد الإلكتروني.");
       emailRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
-    // Check Name
     if (!name) {
       setErrorMessage("يرجى تعبئة حقل الاسم الكامل.");
       nameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
-    // Check Country (already has a default but let's just be safe)
     if (!country) {
       setErrorMessage("يرجى اختيار الدولة.");
-      return false; // You could scroll to country if needed, but it's a select with a default
+      return false;
     }
-    // Check City
     if (!city) {
       setErrorMessage("يرجى تعبئة حقل المدينة.");
       cityRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
-    // Check Street
     if (!street) {
       setErrorMessage("يرجى تعبئة حقل عنوان الشارع.");
       streetRef.current?.scrollIntoView({
@@ -377,96 +487,60 @@ const Checkout = () => {
       });
       return false;
     }
-    // Check Terms
     if (!termsAccepted) {
       setErrorMessage("يرجى الموافقة على الشروط والأحكام للمتابعة.");
       termsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
-    // Check Cart
     if (cart.products.length === 0) {
       setErrorMessage("سلة التسوق فارغة. يرجى إضافة منتجات للمتابعة.");
+      return false;
+    }
+    if (!receiptFile) {
+      setErrorMessage("يرجى تحميل صورة الإيصال.");
+      fileRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
     setErrorMessage("");
     return true;
   };
 
-  // Combined handler: first submit order info then proceed to Tap payment
+  // Handle checkout & receipt upload
   const handleCheckout = async () => {
     if (!validateForm()) return;
     setLoading(true);
-    setCurrentStep("uploading");
-
-    // Save cart details before clearing them
-    const orderTotal = cart.total;
-    const orderProducts = cart.products;
 
     try {
-      // Prepare order data
+      // 1) Create order
       const orderData = {
         userId: localStorage.getItem("userId") || "guestUser",
-        products: orderProducts.map((product) => ({
-          productId: product._id,
-          quantity: product.quantity,
+        products: cart.products.map((p) => ({
+          productId: p._id,
+          quantity: p.quantity,
         })),
-        amount: orderTotal,
-        address: {
-          country,
-          city,
-          street,
-          email,
-          name,
-        },
+        amount: cart.total,
+        address: { country, city, street, email, name },
         status: "pending",
       };
+      const orderRes = await publicRequest.post("/orders", orderData);
+      const orderId = orderRes.data._id;
 
-      // Submit order information
-      const orderResponse = await publicRequest.post("/orders", orderData);
-      if (orderResponse.data) {
-        // Order submitted successfully
-      }
-    } catch (error) {
-      console.error("Error submitting order:", error);
-      setErrorMessage("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.");
-      setLoading(false);
-      return;
-    }
+      // 2) Upload receipt image
+      const formData = new FormData();
+      formData.append("receipt", receiptFile);
+      await publicRequest.post(`/orders/${orderId}/receipt`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-    // Proceed to Tap payment
-    setCurrentStep("processing");
-    try {
-      const payload = {
-        amount: orderTotal,
-        currency: "SAR",
-        items: orderProducts.map((product) => ({
-          name: product.title,
-          quantity: product.quantity,
-          unit_price: product.price,
-        })),
-        redirect: {
-          url: "https://dralsallum.com/payment-success",
-        },
-      };
-
-      const tapResponse = await publicRequest.post("/tap-charge", payload);
-      if (tapResponse.data?.transaction?.url) {
-        // Clear the cart only after successful tap charge creation
-        dispatch(clearCart());
-        window.location.href = tapResponse.data.transaction.url;
-        return;
-      }
-      if (tapResponse.data.status === "CAPTURED") {
-        dispatch(clearCart());
-        navigate("/payment-success");
-      } else {
-        console.error("Tap charge creation failed:", tapResponse.data);
-        setErrorMessage("فشل إنشاء عملية الدفع. يرجى المحاولة مرة أخرى.");
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Error in Tap payment:", error);
-      setErrorMessage("حدث خطأ أثناء معالجة الدفع مع Tap.");
+      // 3) Clear cart & navigate to success
+      dispatch(clearCart());
+      navigate("/payment-success");
+    } catch (err) {
+      console.error("Error processing order or uploading receipt:", err);
+      setErrorMessage(
+        "حدث خطأ أثناء إرسال الطلب أو تحميل الإيصال. يرجى المحاولة مرة أخرى."
+      );
+    } finally {
       setLoading(false);
     }
   };
@@ -524,7 +598,6 @@ const Checkout = () => {
               <span>{"ر.س" + cart.total.toFixed(2)}</span>
             </TotalAmount>
 
-            {/* Ref here for terms if you want to scroll on error */}
             <TermsCheckbox ref={termsRef}>
               <label>
                 <input
@@ -537,18 +610,9 @@ const Checkout = () => {
             </TermsCheckbox>
 
             <ButtonContainer>
-              <BuyNowButton onClick={handleCheckout} disabled={loading}>
-                {loading ? (
-                  <>
-                    <Spinner />{" "}
-                    {currentStep === "uploading"
-                      ? "نقوم بمعالجة طلبك..."
-                      : "جاري التنفيذ..."}
-                  </>
-                ) : (
-                  "أرسل الطلب والدفع"
-                )}
-              </BuyNowButton>
+              <SubmitButton onClick={handleCheckout} disabled={loading}>
+                {loading ? <Spinner /> : "أرسل الطلب"}
+              </SubmitButton>
             </ButtonContainer>
           </OrderSummary>
 
@@ -558,7 +622,7 @@ const Checkout = () => {
               <FormField>
                 <label>البريد الإلكتروني *</label>
                 <input
-                  ref={emailRef} // attach ref
+                  ref={emailRef}
                   type="email"
                   placeholder="مثال: name@email.com"
                   value={email}
@@ -568,7 +632,7 @@ const Checkout = () => {
               <FormField>
                 <label>الاسم الكامل *</label>
                 <input
-                  ref={nameRef} // attach ref
+                  ref={nameRef}
                   type="text"
                   placeholder="الاسم الأول واسم العائلة"
                   value={name}
@@ -595,7 +659,7 @@ const Checkout = () => {
               <FormField>
                 <label>المدينة / البلدة *</label>
                 <input
-                  ref={cityRef} // attach ref
+                  ref={cityRef}
                   type="text"
                   placeholder="أدخل اسم المدينة"
                   value={city}
@@ -605,7 +669,7 @@ const Checkout = () => {
               <FormField>
                 <label>عنوان الشارع *</label>
                 <input
-                  ref={streetRef} // attach ref
+                  ref={streetRef}
                   type="text"
                   placeholder="أدخل عنوان الشارع"
                   value={street}
@@ -613,6 +677,40 @@ const Checkout = () => {
                 />
               </FormField>
             </BillingInfo>
+            <PaymentInfo>
+              <PaymentTitle>معلومات الدفع</PaymentTitle>
+              <BankDetails>
+                <h3>تفاصيل الحساب البنكي</h3>
+                <p>
+                  <strong>اسم البنك:</strong> بنك الرياض
+                </p>
+                <p>
+                  <strong>رقم الحساب:</strong> 2601971299940
+                </p>
+                <p>
+                  <strong>الآيبان:</strong> SA0220000002601971299940
+                </p>
+                <p>
+                  <strong>اسم المستفيد:</strong> مؤسسة سعود خالد فهد السلوم
+                  للتجارة
+                </p>
+              </BankDetails>
+
+              <FileUploadField ref={fileRef}>
+                <label>رفع إيصال الدفع *</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setReceiptFile(e.target.files[0])}
+                />
+                {receiptPreview && (
+                  <UploadPreview>
+                    <img src={receiptPreview} alt="معاينة الإيصال" />
+                    <p>تم رفع الإيصال بنجاح</p>
+                  </UploadPreview>
+                )}
+              </FileUploadField>
+            </PaymentInfo>
           </BillingColumn>
         </CheckoutContent>
       </CheckoutWrapper>
@@ -620,4 +718,4 @@ const Checkout = () => {
   );
 };
 
-export default Checkout;
+export default Money;
