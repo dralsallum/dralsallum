@@ -327,7 +327,7 @@ const Checkout = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(""); // "uploading" or "processing"
+  const [currentStep, setCurrentStep] = useState("");
   const navigate = useNavigate();
 
   // =============== NEW: Refs for each form field ===============

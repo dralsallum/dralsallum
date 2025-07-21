@@ -367,7 +367,7 @@ const Career = () => {
       quantity: 1,
     };
     dispatch(addProduct(product));
-    navigate("/transfer");
+    navigate("/outcome");
   };
 
   return (
