@@ -73,10 +73,6 @@ const EnrollButton = styled.button`
   }
 `;
 
-/* ======================
-   === Video Player ===
-   ====================== */
-
 const VideoPlayerContainer = styled.div`
   position: relative;
   width: 100%;
@@ -363,7 +359,7 @@ const Career = () => {
     const product = {
       _id: "PTYA001",
       title: "أكاديمية التفوق الدراسي",
-      price: 249,
+      price: 149,
       quantity: 1,
     };
     dispatch(addProduct(product));
@@ -386,7 +382,7 @@ const Career = () => {
           كل يوم فرصة للتعلم والنمو الشخصي.
         </AdditionalText>
         <EnrollButton onClick={handleEnroll}>
-          سجل الآن مقابل 249 ريال
+          سجل الآن مقابل 149 ريال
         </EnrollButton>
 
         <VideoPlayer />
