@@ -611,7 +611,7 @@ const Checkout = () => {
                 <input
                   ref={phoneRef}
                   type="text"
-                  placeholder="أدخل اسم المدينة"
+                  placeholder="أدخل رقم الجوال"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                 />
