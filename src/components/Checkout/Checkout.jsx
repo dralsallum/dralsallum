@@ -323,6 +323,7 @@ const Checkout = () => {
   const [name, setName] = useState("");
   const [country, setCountry] = useState("المملكة العربية السعودية");
   const [city, setCity] = useState("");
+  const [phone, setPhone] = useState("");
   const [street, setStreet] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -334,6 +335,7 @@ const Checkout = () => {
   const emailRef = useRef(null);
   const nameRef = useRef(null);
   const cityRef = useRef(null);
+  const phoneRef = useRef(null);
   const streetRef = useRef(null);
   const termsRef = useRef(null);
   // ============================================================
@@ -418,6 +420,7 @@ const Checkout = () => {
           street,
           email,
           name,
+          phone,
         },
         status: "pending",
       };
@@ -601,6 +604,16 @@ const Checkout = () => {
                   placeholder="أدخل اسم المدينة"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
+                />
+              </FormField>
+              <FormField>
+                <label>رقم الجوال *</label>
+                <input
+                  ref={phoneRef}
+                  type="text"
+                  placeholder="أدخل اسم المدينة"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                 />
               </FormField>
               <FormField>
