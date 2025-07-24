@@ -16,14 +16,15 @@ import Personal from "./pages/personal";
 import Audio from "./pages/Audio";
 import Outcome from "./pages/Outcome";
 import Job from "./pages/Job";
-import { Breath, OrderComplete } from "./components";
+import { OrderComplete } from "./components";
 import Lesson from "./pages/Lesson";
 import Teach from "./pages/Teach";
 import Login from "./pages/Login";
 import Transfer from "./pages/Transfer";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import SubscriptionPage from "./pages/SubscriptionPage";
-import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentResult from "./pages/PaymentResult";
+import PaymentSuccess from "./pages/PaymentSuccess"; // Keep your existing success page
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);
@@ -35,7 +36,11 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/personality" element={<Personal />} />
         <Route path="/job" element={<Job />} />
+
+        {/* Payment Routes - Updated */}
+        <Route path="/payment-result" element={<PaymentResult />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
+
         <Route path="/outcome" element={<Outcome />} />
         <Route path="/transfer" element={<Transfer />} />
         <Route path="/policy" element={<Policy />} />

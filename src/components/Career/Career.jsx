@@ -359,7 +359,7 @@ const Career = () => {
     const product = {
       _id: "PTYA001",
       title: "أكاديمية التفوق الدراسي",
-      price: 149,
+      price: 1,
       quantity: 1,
     };
     dispatch(addProduct(product));

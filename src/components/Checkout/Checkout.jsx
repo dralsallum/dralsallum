@@ -401,6 +401,7 @@ const Checkout = () => {
     // Save cart details before clearing them
     const orderTotal = cart.total;
     const orderProducts = cart.products;
+    let createdOrderId = null;
 
     try {
       // Prepare order data
@@ -424,7 +425,8 @@ const Checkout = () => {
       // Submit order information
       const orderResponse = await publicRequest.post("/orders", orderData);
       if (orderResponse.data) {
-        // Order submitted successfully
+        createdOrderId = orderResponse.data._id;
+        console.log("Order created with ID:", createdOrderId);
       }
     } catch (error) {
       console.error("Error submitting order:", error);
@@ -439,26 +441,25 @@ const Checkout = () => {
       const payload = {
         amount: orderTotal,
         currency: "SAR",
+        orderId: createdOrderId,
         items: orderProducts.map((product) => ({
           name: product.title,
           quantity: product.quantity,
           unit_price: product.price,
         })),
-        redirect: {
-          url: "https://dralsallum.com/payment-success",
-        },
       };
 
       const tapResponse = await publicRequest.post("/tap-charge", payload);
       if (tapResponse.data?.transaction?.url) {
-        // Clear the cart only after successful tap charge creation
         dispatch(clearCart());
         window.location.href = tapResponse.data.transaction.url;
         return;
       }
+
+      // Handle immediate success (shouldn't happen with redirect, but just in case)
       if (tapResponse.data.status === "CAPTURED") {
         dispatch(clearCart());
-        navigate("/payment-success");
+        navigate(`/payment-success`);
       } else {
         console.error("Tap charge creation failed:", tapResponse.data);
         setErrorMessage("فشل إنشاء عملية الدفع. يرجى المحاولة مرة أخرى.");
