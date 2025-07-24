@@ -42,6 +42,7 @@ const App = () => {
         <Route path="/payment-success" element={<PaymentSuccess />} />
 
         <Route path="/outcome" element={<Outcome />} />
+        <Route path="/refund" element={<Outcome />} />
         <Route path="/transfer" element={<Transfer />} />
         <Route path="/policy" element={<Policy />} />
         <Route path="/audio" element={<Audio />} />

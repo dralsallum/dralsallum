@@ -27,3 +27,4 @@ export { default as Podcast } from "./Podcast/Podcast";
 export { default as Very } from "./Very/Very";
 export { default as Last } from "./Last/Last";
 export { default as Money } from "./Money/Money";
+export { default as Mistake } from "./Mistake/Mistake";
