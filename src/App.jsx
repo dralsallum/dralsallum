@@ -26,6 +26,7 @@ import SubscriptionPage from "./pages/SubscriptionPage";
 import PaymentResult from "./pages/PaymentResult";
 import PaymentSuccess from "./pages/PaymentSuccess"; // Keep your existing success page
 import Refund from "./pages/Refund";
+import Reach from "./pages/Reach";
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);
@@ -41,6 +42,7 @@ const App = () => {
         {/* Payment Routes - Updated */}
         <Route path="/payment-result" element={<PaymentResult />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/reach" element={<Reach />} />
 
         <Route path="/outcome" element={<Outcome />} />
         <Route path="/refund" element={<Refund />} />

@@ -44,7 +44,7 @@ const Footer = () => {
           </FooterLinksItems>
           <FooterLinksItems>
             <FooterLinkTitle>تواصل معنا</FooterLinkTitle>
-            <FooterLink to="/sign-up">كيف يعمل</FooterLink>
+            <FooterLink to="/reach">طرق التواصل</FooterLink>
             <FooterLink to="/">شهادة المستخدمين</FooterLink>
           </FooterLinksItems>
         </FooterLinksWrapper>

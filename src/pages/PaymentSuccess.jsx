@@ -231,7 +231,7 @@ const PaymentSuccess = () => {
 
         <ButtonContainer>
           <PrimaryButton to="/">العودة للصفحة الرئيسية</PrimaryButton>
-          <SecondaryButton to="/contact">تواصل معنا</SecondaryButton>
+          <SecondaryButton to="/reach">تواصل معنا</SecondaryButton>
         </ButtonContainer>
       </SuccessWrapper>
     </PageContainer>
