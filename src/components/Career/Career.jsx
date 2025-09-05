@@ -42,6 +42,32 @@ const HeroHeading = styled.h1`
   }
 `;
 
+const CountUpContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+`;
+
+const CountNumber = styled.span`
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ff7143;
+  @media (max-width: 768px) {
+    font-size: 2.3rem;
+  }
+`;
+
+const CountText = styled.span`
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #333;
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+`;
+
 const HeroSubheading = styled.h2`
   font-size: 1.25rem;
   font-weight: 400;
@@ -56,6 +82,10 @@ const AdditionalText = styled.p`
   font-size: 1rem;
   color: #666;
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
 `;
 
 const EnrollButton = styled.button`
@@ -192,6 +222,42 @@ const IconButton = styled.button`
 `;
 
 const FullscreenButton = styled(IconButton)``;
+
+// Count Up Hook
+const useCountUp = (end, duration = 2000) => {
+  const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    if (!hasStarted) return;
+
+    let startTime;
+    const startValue = 0;
+
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+
+      // Easing function for smoother animation
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const currentCount = Math.floor(
+        startValue + (end - startValue) * easeOutQuart
+      );
+
+      setCount(currentCount);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [end, duration, hasStarted]);
+
+  const startCountUp = () => setHasStarted(true);
+
+  return [count, startCountUp];
+};
 
 const VideoPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -354,6 +420,16 @@ const VideoPlayer = () => {
 const Career = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [studentCount, startCountUp] = useCountUp(12324, 2500);
+
+  useEffect(() => {
+    // Start the count-up animation when the component mounts
+    const timer = setTimeout(() => {
+      startCountUp();
+    }, 500); // Small delay for better visual effect
+
+    return () => clearTimeout(timer);
+  }, [startCountUp]);
 
   const handleEnroll = () => {
     const product = {
@@ -371,15 +447,19 @@ const Career = () => {
       <NavTech />
 
       <HeroSection>
-        <HeroHeading>انطلق نحو مستقبل أكاديمي مشرق</HeroHeading>
+        <CountUpContainer>
+          <CountNumber>{studentCount.toLocaleString()}</CountNumber>
+          <CountText>مستفيد من الدورة</CountText>
+        </CountUpContainer>
+
         <HeroSubheading>
           استكشف أساليب الدراسة الذكية والتقنيات التعليمية المبتكرة لتحقيق تفوقك
-          الدراسي وتطوير مهاراتك الأكاديمية. انضم إلى برنامجنا المتكامل واستعد
-          لتحويل تجربتك التعليمية إلى رحلة مليئة بالإبداع والنجاح.
+          الدراسي. انضم إلى برنامجنا المتكامل واستعد لتحويل تجربتك التعليمية إلى
+          رحلة مليئة بالإبداع والنجاح.
         </HeroSubheading>
         <AdditionalText>
-          تعلم كيف تدمج بين النظرية والتطبيق، وتبنّى أساليب دراسة جديدة تجعل من
-          كل يوم فرصة للتعلم والنمو الشخصي.
+          تعلم كيف تبنّى أساليب دراسة جديدة تجعل من كل يوم فرصة للتعلم والنمو
+          الشخصي.
         </AdditionalText>
         <EnrollButton onClick={handleEnroll}>
           سجل الآن مقابل 149 ريال
