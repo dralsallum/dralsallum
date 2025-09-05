@@ -16,4 +16,4 @@ User-agent: Bingbot
 Disallow: /no-bing/
 
 # Sitemap location
-Sitemap: https://wuay.net/sitemap.xml
+Sitemap: https://dralsallum.net/sitemap.xml
