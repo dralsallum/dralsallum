@@ -27,6 +27,7 @@ import PaymentResult from "./pages/PaymentResult";
 import PaymentSuccess from "./pages/PaymentSuccess"; // Keep your existing success page
 import Refund from "./pages/Refund";
 import Reach from "./pages/Reach";
+import Sales from "./pages/Sales";
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);
@@ -38,6 +39,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/personality" element={<Personal />} />
         <Route path="/job" element={<Job />} />
+        <Route path="/sales" element={<Sales />} />
 
         {/* Payment Routes - Updated */}
         <Route path="/payment-result" element={<PaymentResult />} />
