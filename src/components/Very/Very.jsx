@@ -189,6 +189,7 @@ const NewsletterTitle = styled.h2`
   text-align: right;
 
   @media (max-width: 768px) {
+    font-size: 1.6rem;
     justify-content: center;
   }
 `;

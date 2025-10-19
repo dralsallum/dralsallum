@@ -28,6 +28,7 @@ import PaymentSuccess from "./pages/PaymentSuccess"; // Keep your existing succe
 import Refund from "./pages/Refund";
 import Reach from "./pages/Reach";
 import Sales from "./pages/Sales";
+import Upload from "./pages/Upload";
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);
@@ -82,6 +83,7 @@ const App = () => {
 
         {/* Add a subscription route for users who need to upgrade */}
         <Route path="/upgrade" element={<SubscriptionPage />} />
+        <Route path="/upload" element={<Upload />} />
       </Routes>
     </Router>
   );

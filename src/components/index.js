@@ -30,3 +30,4 @@ export { default as Money } from "./Money/Money";
 export { default as Mistake } from "./Mistake/Mistake";
 export { default as Contact } from "./Contact/Contact";
 export { default as Discount } from "./Discount/Discount";
+export { default as Apply } from "./Apply/Apply";
