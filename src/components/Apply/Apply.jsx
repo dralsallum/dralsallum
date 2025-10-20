@@ -65,6 +65,7 @@ const Apply = () => {
   const [sector, setSector] = useState(""); // Government or Private sector
   const [hasLoans, setHasLoans] = useState(""); // Previous loans
   const [salaryRange, setSalaryRange] = useState("");
+  const [investmentRange, setInvestmentRange] = useState("");
   const [disciplineOptions, setDisciplineOptions] = useState([]);
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +84,7 @@ const Apply = () => {
     مهندس: ["اخرى", "بترولي", "معماري", "ميكانيكي", "كهربائي", "ميداني"],
     مدرس: ["اخرى", "علوم دينية", "احياء", "فيزياء", "رياضيات"],
     اداري: ["اداري تجاري", "قطاع صحي"],
+    اخرى: [],
   };
 
   // Salary range options
@@ -93,6 +95,13 @@ const Apply = () => {
     "15,000 - 20,000 ريال",
     "20,000 - 30,000 ريال",
     "أكثر من 30,000 ريال",
+  ];
+
+  // Investment range options
+  const investmentRanges = [
+    "250,000 - 500,000 ريال",
+    "500,000 - 750,000 ريال",
+    "750,000 - 1,000,000 ريال",
   ];
 
   const submitApplication = async () => {
@@ -108,6 +117,7 @@ const Apply = () => {
       sector,
       hasLoans,
       salaryRange,
+      investmentRange,
     };
 
     try {
@@ -165,6 +175,15 @@ const Apply = () => {
     }
 
     setIsMasterOneVisible(!isMasterOneVisible);
+  };
+
+  const handleProfessionChange = (e) => {
+    const selectedProfession = e.target.value;
+    setProfession(selectedProfession);
+
+    // Reset discipline and otherSpecialty when profession changes
+    setDiscipline("");
+    setOtherSpecialty("");
   };
 
   useEffect(() => {
@@ -349,9 +368,7 @@ const Apply = () => {
                                   <HiFiSel
                                     id="profession"
                                     value={profession}
-                                    onChange={(e) =>
-                                      handleSelectChange(e, setProfession)
-                                    }
+                                    onChange={handleProfessionChange}
                                     disabled={isLoading}
                                   >
                                     <HiFiOp value="">-- اختر المهنة --</HiFiOp>
@@ -373,7 +390,11 @@ const Apply = () => {
                                     onChange={(e) =>
                                       handleSelectChange(e, setDiscipline)
                                     }
-                                    disabled={!profession || isLoading}
+                                    disabled={
+                                      !profession ||
+                                      profession === "اخرى" ||
+                                      isLoading
+                                    }
                                   >
                                     <HiFiOp value="">-- اختر الشهادة --</HiFiOp>
                                     {disciplineOptions.map((option) => (
@@ -392,7 +413,11 @@ const Apply = () => {
                                     onChange={(e) =>
                                       handleSelectChange(e, setOtherSpecialty)
                                     }
-                                    disabled={isLoading}
+                                    disabled={
+                                      (profession !== "اخرى" &&
+                                        discipline !== "اخرى") ||
+                                      isLoading
+                                    }
                                   >
                                     <HiFiOp value="">-- تخصصات اخرى --</HiFiOp>
                                     <HiFiOp value="technician">فني</HiFiOp>
@@ -465,6 +490,27 @@ const Apply = () => {
                                       -- حدد نطاق الراتب --
                                     </HiFiOp>
                                     {salaryRanges.map((range, index) => (
+                                      <HiFiOp key={index} value={range}>
+                                        {range}
+                                      </HiFiOp>
+                                    ))}
+                                  </HiFiSel>
+                                  <HiOnSp></HiOnSp>
+                                </HiWraOn>
+                                <HiWraOn>
+                                  <HiFiLa>المبلغ المستعد للاستثمار *</HiFiLa>
+                                  <HiFiSel
+                                    id="investmentRange"
+                                    value={investmentRange}
+                                    onChange={(e) =>
+                                      handleSelectChange(e, setInvestmentRange)
+                                    }
+                                    disabled={isLoading}
+                                  >
+                                    <HiFiOp value="">
+                                      -- حدد نطاق الاستثمار --
+                                    </HiFiOp>
+                                    {investmentRanges.map((range, index) => (
                                       <HiFiOp key={index} value={range}>
                                         {range}
                                       </HiFiOp>
