@@ -16,7 +16,7 @@ import Personal from "./pages/personal";
 import Audio from "./pages/Audio";
 import Outcome from "./pages/Outcome";
 import Job from "./pages/Job";
-import { OrderComplete } from "./components";
+import { Invest, OrderComplete } from "./components";
 import Lesson from "./pages/Lesson";
 import Teach from "./pages/Teach";
 import Login from "./pages/Login";
@@ -29,6 +29,8 @@ import Refund from "./pages/Refund";
 import Reach from "./pages/Reach";
 import Sales from "./pages/Sales";
 import Upload from "./pages/Upload";
+import Task from "./pages/Task";
+import Share from "./pages/Share";
 
 const App = () => {
   const user = useSelector((state) => state.user.currentUser);
@@ -41,6 +43,7 @@ const App = () => {
         <Route path="/personality" element={<Personal />} />
         <Route path="/job" element={<Job />} />
         <Route path="/sales" element={<Sales />} />
+        <Route path="/invest/:id" element={<Invest />} />
 
         {/* Payment Routes - Updated */}
         <Route path="/payment-result" element={<PaymentResult />} />
@@ -50,6 +53,8 @@ const App = () => {
         <Route path="/outcome" element={<Outcome />} />
         <Route path="/refund" element={<Refund />} />
         <Route path="/transfer" element={<Transfer />} />
+        <Route path="/task" element={<Task />} />
+        <Route path="/shares" element={<Share />} />
         <Route path="/policy" element={<Policy />} />
         <Route path="/audio" element={<Audio />} />
         <Route path="/product/:category" element={<Product />} />

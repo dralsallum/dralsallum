@@ -31,3 +31,6 @@ export { default as Mistake } from "./Mistake/Mistake";
 export { default as Contact } from "./Contact/Contact";
 export { default as Discount } from "./Discount/Discount";
 export { default as Apply } from "./Apply/Apply";
+export { default as Problem } from "./Problem/Problem";
+export { default as Add } from "./Add/Add";
+export { default as Invest } from "./Invest/Invest";
