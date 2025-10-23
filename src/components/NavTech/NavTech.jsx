@@ -12,6 +12,9 @@ const Header = styled.header`
   padding: 1rem 2rem;
   background: #f8f6f2;
   direction: rtl;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* 🌟 Downward subtle shadow */
+  position: relative;
+  z-index: 1000;
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -46,7 +49,6 @@ const NavLinks = styled.nav`
   }
 `;
 
-/* NavLink for desktop navigation using react-router-dom Link */
 const NavLinkStyled = styled(Link)`
   text-decoration: none;
   color: #000;
@@ -67,7 +69,7 @@ const SubscribeButton = styled(Link)`
   font-size: 0.9rem;
 
   @media (max-width: 768px) {
-    display: none; /* Hidden on mobile */
+    display: none;
   }
 `;
 
@@ -94,13 +96,13 @@ const MobileMenuContainer = styled.div`
     display: block;
     background: #fff;
     position: absolute;
-    top: 70px; /* Adjust as needed */
+    top: 70px;
     right: 1rem;
     left: 1rem;
     z-index: 999;
     padding: 1rem;
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
   }
 `;
 
@@ -114,7 +116,6 @@ const MobileMenuItem = styled.li`
   margin: 0.5rem 0;
 `;
 
-/* MobileMenuLink mirrors the desktop NavLinkStyled */
 const MobileMenuLink = styled(Link)`
   text-decoration: none;
   color: #333;
@@ -128,9 +129,7 @@ const MobileMenuLink = styled(Link)`
 const NavTech = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
     <>
@@ -154,6 +153,7 @@ const NavTech = () => {
         <SubscribeButton to="/login">
           انضم إلى أكثر من 260 ألف مشترك
         </SubscribeButton>
+
         <MenuButton onClick={toggleMenu}>☰</MenuButton>
       </Header>
 

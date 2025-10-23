@@ -3,6 +3,7 @@ import styled, { keyframes } from "styled-components";
 import { Menu, Plus, X, Loader2 } from "lucide-react";
 import axios from "axios";
 import NavTech from "../NavTech/NavTech";
+import { useNavigate } from "react-router-dom"; // ✅ import navigation
 
 const BREAKPOINT_PHONE = "640px";
 
@@ -120,6 +121,7 @@ const FilterContainer = styled.div`
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
+
   @media (max-width: ${BREAKPOINT_PHONE}) &::-webkit-scrollbar {
     display: none;
   }
@@ -133,7 +135,6 @@ const FilterButton = styled.button`
   cursor: pointer;
   transition: all 0.2s;
   outline: none;
-
   background: ${(p) => (p.active ? COLORS.green : COLORS.white)};
   color: ${(p) => (p.active ? COLORS.white : COLORS.text)};
   border: 1px solid ${(p) => (p.active ? "transparent" : "#E5E5E5")};
@@ -152,7 +153,7 @@ const FilterButton = styled.button`
   }
 `;
 
-/* 📋 Problems Grid */
+/* 📋 Grid */
 const ProblemsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -272,7 +273,7 @@ const FloatingButton = styled.button`
   }
 `;
 
-/* ⏳ Loading Gear */
+/* ⏳ Loading */
 const spin = keyframes`
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -296,6 +297,7 @@ const Problem = () => {
   const [activeFilter, setActiveFilter] = useState("الكل");
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // ✅ Hook for navigation
 
   const filters = [
     "الكل",
@@ -381,7 +383,10 @@ const Problem = () => {
             <p style={{ textAlign: "center", width: "100%" }}>لا توجد نتائج</p>
           ) : (
             problems.map((p, index) => (
-              <ProblemCard key={index}>
+              <ProblemCard
+                key={index}
+                onClick={() => navigate(`/invest/${p._id}`)}
+              >
                 <ProblemTitle>{p.describe}</ProblemTitle>
                 {p.category && <Badge>{p.category}</Badge>}
                 <DateText>

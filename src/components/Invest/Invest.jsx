@@ -1,92 +1,53 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { publicRequest } from "../../requestMethods";
+import NavTech from "../NavTech/NavTech";
 
-// Styled Components
+/* 🎨 Elegant Color Palette (matches your image) */
+const COLORS = {
+  background: "#F7F8F4",
+  heading: "#000000",
+  text: "#333333",
+  date: "#3B7E53",
+  border: "#E6E6E6",
+  highlightBg: "#E4D7EE",
+  highlightText: "#3B2640",
+  accent: "#ff7143",
+};
+
+/* ========== Styled Components ========== */
 const Container = styled.div`
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: ${COLORS.background};
+  direction: rtl;
+  font-family: "Tajawal", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  padding-bottom: 40px;
 `;
 
 const Header = styled.header`
   background-color: white;
-  border-bottom: 1px solid #e5e7eb;
-`;
-
-const HeaderContent = styled.div`
-  max-width: 1152px;
-  margin: 0 auto;
-  padding: 16px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const Logo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-
-const LogoIcon = styled.div`
-  width: 40px;
-  height: 40px;
-  background-color: black;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 20px;
-  font-weight: bold;
-`;
-
-const LogoText = styled.span`
-  font-size: 20px;
-  font-weight: bold;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-`;
-
-const LangButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  font-weight: 500;
-`;
-
-const MenuButton = styled.button`
-  padding: 8px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
+  border-bottom: 2px solid ${COLORS.border};
 `;
 
 const Main = styled.main`
-  max-width: 896px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 48px 24px;
+  padding: 60px 24px;
 `;
 
 const Title = styled.h1`
-  font-size: 36px;
-  font-weight: bold;
-  margin-bottom: 24px;
-  line-height: 1.2;
+  font-size: 34px;
+  font-weight: 700;
+  color: ${COLORS.heading};
+  line-height: 1.4;
+  margin-bottom: 16px;
 `;
 
 const DateText = styled.div`
-  color: #0d9488;
-  font-weight: 500;
+  color: ${COLORS.date};
+  font-weight: 600;
+  font-size: 16px;
   margin-bottom: 48px;
 `;
 
@@ -95,22 +56,33 @@ const Section = styled.section`
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 24px;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: ${COLORS.heading};
 `;
 
 const Text = styled.p`
   font-size: 18px;
-  line-height: 1.7;
+  line-height: 1.8;
+  color: ${COLORS.text};
   margin-bottom: ${(props) => (props.$noMargin ? "0" : "24px")};
+`;
+
+const Highlight = styled.span`
+  background-color: ${COLORS.highlightBg};
+  color: ${COLORS.highlightText};
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
 `;
 
 const List = styled.ul`
   font-size: 18px;
-  line-height: 1.7;
-  padding-left: 24px;
+  line-height: 1.8;
+  padding-right: 24px;
   list-style: disc;
+  color: ${COLORS.text};
 `;
 
 const ListItem = styled.li`
@@ -125,19 +97,22 @@ const AuthorInfo = styled.div`
 
 const AuthorField = styled.p`
   font-size: 18px;
+  color: ${COLORS.text};
 
   span {
-    font-weight: bold;
+    font-weight: 700;
+    color: ${COLORS.heading};
   }
 `;
 
 const Link = styled.a`
-  color: #0d9488;
+  color: ${COLORS.accent};
   text-decoration: underline;
 `;
 
 const CommentsCard = styled.div`
   background-color: white;
+  border: 1px solid ${COLORS.border};
   border-radius: 8px;
   padding: 32px;
   margin-bottom: 32px;
@@ -145,7 +120,8 @@ const CommentsCard = styled.div`
 
 const CommentsTitle = styled.h3`
   font-size: 20px;
-  font-weight: bold;
+  font-weight: 700;
+  color: ${COLORS.heading};
   margin-bottom: 24px;
 `;
 
@@ -157,32 +133,30 @@ const EmptyComments = styled.div`
 
 const Button = styled.button`
   width: 100%;
-  background-color: #115e59;
+  background-color: ${COLORS.accent};
   color: white;
-  font-weight: 500;
+  font-weight: 600;
   padding: 16px;
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: 0.3s;
 
   &:hover {
-    background-color: #134e4a;
+    background-color: #ff5117;
   }
 `;
 
 const Footer = styled.footer`
-  background-color: #115e59;
-  color: white;
+  background-color: white;
+  border-top: 1px solid ${COLORS.border};
+  color: ${COLORS.text};
   padding: 24px 0;
+  margin-top: 48px;
 `;
 
 const FooterContent = styled.div`
-  max-width: 1152px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 0 24px;
 `;
@@ -194,7 +168,7 @@ const FooterLink = styled.a`
   gap: 12px;
   font-size: 18px;
   font-weight: 500;
-  color: white;
+  color: ${COLORS.accent};
   text-decoration: none;
 
   &:hover {
@@ -205,10 +179,10 @@ const FooterLink = styled.a`
 const FAB = styled.button`
   position: fixed;
   bottom: 32px;
-  right: 32px;
+  left: 32px;
   width: 56px;
   height: 56px;
-  background-color: #115e59;
+  background-color: ${COLORS.accent};
   color: white;
   border-radius: 50%;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -217,16 +191,16 @@ const FAB = styled.button`
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.3s;
 
   &:hover {
-    background-color: #134e4a;
+    background-color: #ff5117;
   }
 `;
 
 const LoadingContainer = styled.div`
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: ${COLORS.background};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -234,12 +208,12 @@ const LoadingContainer = styled.div`
   color: ${(props) => (props.$error ? "#dc2626" : "#6b7280")};
 `;
 
+/* ========== Main Component ========== */
 const Invest = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get ID from URL path
   const getId = () => {
     const path = window.location.pathname;
     const segments = path.split("/");
@@ -252,7 +226,7 @@ const Invest = () => {
 
       if (!id || id === "invest") {
         setLoading(false);
-        setError("No problem ID provided");
+        setError("لم يتم تحديد رقم المشروع");
         return;
       }
 
@@ -262,7 +236,7 @@ const Invest = () => {
         setData(response.data);
         setError(null);
       } catch (err) {
-        setError("Failed to load problem details");
+        setError("فشل تحميل تفاصيل المشروع");
         console.error(err);
       } finally {
         setLoading(false);
@@ -272,22 +246,14 @@ const Invest = () => {
     fetchData();
   }, []);
 
-  if (loading) {
-    return <LoadingContainer>Loading...</LoadingContainer>;
-  }
-
-  if (error) {
-    return <LoadingContainer $error>{error}</LoadingContainer>;
-  }
-
-  if (!data) {
-    return null;
-  }
+  if (loading) return <LoadingContainer>جاري التحميل...</LoadingContainer>;
+  if (error) return <LoadingContainer $error>{error}</LoadingContainer>;
+  if (!data) return null;
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date
-      .toLocaleDateString("en-GB", {
+      .toLocaleDateString("ar-SA", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
@@ -298,145 +264,77 @@ const Invest = () => {
   const parseListItems = (text) => {
     const lines = text.split("\n");
     return lines
-      .map((line, index) => {
-        if (line.trim().startsWith("•") || line.trim().startsWith("-")) {
-          return (
-            <ListItem key={index}>{line.replace(/^[•-]\s*/, "")}</ListItem>
-          );
-        }
-        return null;
-      })
+      .map((line, i) =>
+        line.trim().startsWith("•") || line.trim().startsWith("-") ? (
+          <ListItem key={i}>{line.replace(/^[•-]\s*/, "")}</ListItem>
+        ) : null
+      )
       .filter(Boolean);
   };
 
   return (
     <Container>
-      {/* Header */}
-      <Header>
-        <HeaderContent>
-          <Logo>
-            <LogoIcon>P</LogoIcon>
-            <LogoText>ProblemHunt</LogoText>
-          </Logo>
-          <HeaderActions>
-            <LangButton>
-              <span style={{ fontSize: "24px" }}>🇺🇸</span>
-              <span>EN</span>
-            </LangButton>
-            <MenuButton>
-              <svg
-                style={{ width: "24px", height: "24px" }}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </MenuButton>
-          </HeaderActions>
-        </HeaderContent>
-      </Header>
+      <NavTech />
 
-      {/* Main Content */}
       <Main>
-        <Title>
-          {data.title || "Automating HR and legal processes for companies"}
-        </Title>
+        <Title>{data.title || "مشروع استثماري جديد"}</Title>
         <DateText>{formatDate(data.createdAt)}</DateText>
 
-        {/* Problem Description */}
         <Section>
-          <SectionTitle>1. Describe the problem:</SectionTitle>
+          <SectionTitle>
+            ١. وصف <Highlight>المشكلة</Highlight>
+          </SectionTitle>
           <Text>{data.describe.split("\n")[0]}</Text>
           {data.describe.includes("•") && (
             <List>{parseListItems(data.describe)}</List>
           )}
         </Section>
 
-        {/* How Often */}
         <Section>
-          <SectionTitle>2. How often does the problem occur?</SectionTitle>
+          <SectionTitle>٢. عدد مرات حدوث المشكلة</SectionTitle>
           <Text $noMargin>{data.occur}</Text>
         </Section>
 
-        {/* Attempts */}
         <Section>
-          <SectionTitle>
-            3. What attempts have you made to solve the problem?
-          </SectionTitle>
+          <SectionTitle>٣. المحاولات السابقة للحل</SectionTitle>
           <Text $noMargin>{data.attempts}</Text>
         </Section>
 
-        {/* Payment */}
         <Section>
-          <SectionTitle>
-            4. How much are you willing to pay for the solution?
-          </SectionTitle>
+          <SectionTitle>٤. المبلغ المقترح للحل</SectionTitle>
           <Text $noMargin>{data.pay}</Text>
         </Section>
 
-        {/* Author */}
         <Section>
-          <SectionTitle>5. Problem author:</SectionTitle>
+          <SectionTitle>٥. معلومات صاحب الفكرة</SectionTitle>
           <AuthorInfo>
             <AuthorField>
-              <span>Name:</span> {data.author.split(",")[0]?.trim() || "Sergey"}
+              <span>الاسم:</span>{" "}
+              {data.author.split(",")[0]?.trim() || "غير معروف"}
             </AuthorField>
             <AuthorField>
-              <span>Country:</span>{" "}
-              {data.author.split(",")[1]?.trim() || "Russia"}
+              <span>الدولة:</span>{" "}
+              {data.author.split(",")[1]?.trim() || "غير محددة"}
             </AuthorField>
             <AuthorField>
-              <span>Contacts:</span> <Link href="#">Telegram</Link>
+              <span>وسيلة التواصل:</span> <Link href="#">تيليجرام</Link>
             </AuthorField>
           </AuthorInfo>
         </Section>
 
-        {/* Comments Section */}
         <CommentsCard>
-          <CommentsTitle>Comments</CommentsTitle>
-          <EmptyComments>Be the first to add a comment</EmptyComments>
-          <Button>
-            <svg
-              style={{ width: "20px", height: "20px" }}
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-            </svg>
-            LOG IN TO COMMENT
-          </Button>
+          <CommentsTitle>التعليقات</CommentsTitle>
+          <EmptyComments>كن أول من يضيف تعليقًا</EmptyComments>
+          <Button>تسجيل الدخول لإضافة تعليق</Button>
         </CommentsCard>
       </Main>
 
-      {/* Footer */}
       <Footer>
         <FooterContent>
-          <FooterLink href="#">
-            Telegram channel with notifications about new problems
-            <svg
-              style={{ width: "24px", height: "24px" }}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 7l5 5m0 0l-5 5m5-5H6"
-              />
-            </svg>
-          </FooterLink>
+          <FooterLink href="#">قناة تيليجرام لمتابعة الفرص الجديدة</FooterLink>
         </FooterContent>
       </Footer>
 
-      {/* Floating Action Button */}
       <FAB>
         <svg
           style={{ width: "24px", height: "24px" }}
