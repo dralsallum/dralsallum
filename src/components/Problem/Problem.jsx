@@ -37,33 +37,6 @@ const Container = styled.div`
   }
 `;
 
-const Marquee = styled.div`
-  background: ${COLORS.orange};
-  color: white;
-  padding: 8px 0;
-  overflow: hidden;
-  white-space: nowrap;
-  font-size: 14px;
-
-  @media (max-width: ${BREAKPOINT_PHONE}) {
-    font-size: 12px;
-    padding: 6px 0;
-  }
-`;
-
-const MarqueeContent = styled.div`
-  display: inline-block;
-  animation: scroll 20s linear infinite;
-  @keyframes scroll {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-50%);
-    }
-  }
-`;
-
 /* 🧭 Hero Section */
 const Hero = styled.div`
   text-align: center;
@@ -350,8 +323,6 @@ const Problem = () => {
     "قطاع المرافق",
   ];
 
-  const marqueeText = "تم الإنشاء بناءً على أساليب Y Combinator   ";
-
   // Helper function to truncate text to first 10 words
   const truncateToWords = (text, wordLimit = 12) => {
     if (!text) return "";
@@ -383,10 +354,6 @@ const Problem = () => {
 
   return (
     <Container>
-      <Marquee>
-        <MarqueeContent>{marqueeText.repeat(20)}</MarqueeContent>
-      </Marquee>
-
       <NavTech />
 
       <Hero>
