@@ -368,7 +368,7 @@ const Problem = () => {
     setLoading(true);
     try {
       const params = {};
-      if (activeFilter !== "الكل") params.type = activeFilter;
+      if (activeFilter !== "الكل") params.category = activeFilter;
       const res = await axios.get(
         "https://dralsallumapi-8efe1bd8f8df.herokuapp.com/api/combinator",
         { params }
