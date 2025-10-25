@@ -73,6 +73,7 @@ const Hero = styled.div`
 
   @media (max-width: ${BREAKPOINT_PHONE}) {
     padding: 18px 14px 8px;
+    margin-top:10px:
   }
 `;
 
