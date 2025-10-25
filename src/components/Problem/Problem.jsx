@@ -73,7 +73,6 @@ const Hero = styled.div`
 
   @media (max-width: ${BREAKPOINT_PHONE}) {
     padding: 18px 14px 8px;
-    margin-top:10px:
   }
 `;
 
@@ -210,12 +209,12 @@ const ProblemTitle = styled.h3`
   line-height: 1.45;
   margin: 0 0 14px;
   color: ${COLORS.text};
+  text-align: center;
 
   @media (max-width: ${BREAKPOINT_PHONE}) {
     font-size: 14px;
     line-height: 1.5;
     margin-bottom: 10px;
-    text-align: center;
   }
 `;
 
