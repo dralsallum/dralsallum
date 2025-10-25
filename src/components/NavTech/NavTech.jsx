@@ -99,7 +99,7 @@ const MobileMenuContainer = styled.div`
     top: 70px;
     right: 1rem;
     left: 1rem;
-    z-index: 999;
+    z-index: 1000;
     padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
