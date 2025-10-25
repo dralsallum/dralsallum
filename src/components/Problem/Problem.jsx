@@ -3,7 +3,7 @@ import styled, { keyframes } from "styled-components";
 import { Menu, Plus, X, Loader2 } from "lucide-react";
 import axios from "axios";
 import NavTech from "../NavTech/NavTech";
-import { useNavigate } from "react-router-dom"; // ✅ import navigation
+import { useNavigate } from "react-router-dom";
 
 const BREAKPOINT_PHONE = "640px";
 
@@ -18,6 +18,11 @@ const COLORS = {
   textMuted: "#6B6B6B",
   orange: "#ff6b35",
 };
+
+const blink = keyframes`
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+`;
 
 /* 📦 Layout */
 const Container = styled.div`
@@ -80,7 +85,7 @@ const Title = styled.h1`
   font-size: 56px;
 
   @media (max-width: ${BREAKPOINT_PHONE}) {
-    font-size: 28px;
+    font-size: 32px;
     text-align: center;
   }
 `;
@@ -116,7 +121,7 @@ const FilterContainer = styled.div`
     justify-content: flex-start;
     gap: 8px;
     padding: 0 10px;
-    margin: 6px 0 10px;
+    margin: 6px 0 15px;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -293,11 +298,33 @@ const LoadingGear = styled(Loader2)`
   height: 56px;
 `;
 
+const Cursor = styled.span`
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background-color: ${COLORS.green};
+  margin-right: 2px;
+  animation: ${blink} 1s step-end infinite;
+  vertical-align: text-bottom;
+`;
+
 const Problem = () => {
   const [activeFilter, setActiveFilter] = useState("الكل");
   const [problems, setProblems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // ✅ Hook for navigation
+  const fullText = "فعلاً الناس";
+  const [displayedText, setDisplayedText] = useState("");
+  const navigate = useNavigate();
+  const genNav = (path) => navigate(path);
+  useEffect(() => {
+    if (displayedText.length < fullText.length) {
+      const timeout = setTimeout(() => {
+        setDisplayedText(fullText.slice(0, displayedText.length + 1));
+      }, 100); // Speed: 150ms per character
+
+      return () => clearTimeout(timeout);
+    }
+  }, [displayedText]);
 
   const filters = [
     "الكل",
@@ -325,6 +352,14 @@ const Problem = () => {
 
   const marqueeText = "تم الإنشاء بناءً على أساليب Y Combinator   ";
 
+  // Helper function to truncate text to first 10 words
+  const truncateToWords = (text, wordLimit = 12) => {
+    if (!text) return "";
+    const words = text.trim().split(/\s+/);
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(" ") + "...";
+  };
+
   useEffect(() => {
     fetchProblems();
   }, [activeFilter]);
@@ -333,7 +368,7 @@ const Problem = () => {
     setLoading(true);
     try {
       const params = {};
-      if (activeFilter !== "الكل") params.category = activeFilter;
+      if (activeFilter !== "الكل") params.type = activeFilter;
       const res = await axios.get(
         "https://dralsallumapi-8efe1bd8f8df.herokuapp.com/api/combinator",
         { params }
@@ -356,7 +391,11 @@ const Problem = () => {
 
       <Hero>
         <Title>
-          أفكار شركات ناشئة يحتاجها <OrangeText>فعلاً الناس</OrangeText>
+          أفكار شركات ناشئة يحتاجها{" "}
+          <OrangeText>
+            {displayedText}
+            <Cursor />
+          </OrangeText>
         </Title>
         <Subtitle>مشاكل غير محلولة يرغب الناس في دفع المال لحلها.</Subtitle>
       </Hero>
@@ -387,8 +426,9 @@ const Problem = () => {
                 key={index}
                 onClick={() => navigate(`/invest/${p._id}`)}
               >
-                <ProblemTitle>{p.describe}</ProblemTitle>
-                {p.category && <Badge>{p.category}</Badge>}
+                <ProblemTitle>{truncateToWords(p.describe)}</ProblemTitle>
+                {p.type && <Badge>{p.type}</Badge>}{" "}
+                {/* Changed from category to type */}
                 <DateText>
                   {new Date(p.createdAt).toLocaleDateString("ar-SA")}
                 </DateText>
@@ -398,7 +438,12 @@ const Problem = () => {
         </ProblemsGrid>
       )}
 
-      <FloatingButton aria-label="إضافة">
+      <FloatingButton
+        aria-label="إضافة"
+        onClick={() => {
+          genNav("/shares");
+        }}
+      >
         <Plus size={26} />
       </FloatingButton>
     </Container>

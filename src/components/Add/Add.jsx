@@ -42,7 +42,7 @@ const Content = styled.div`
 
   @media (max-width: 968px) {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1rem;
     padding: 2rem 2rem;
   }
 `;
@@ -54,14 +54,22 @@ const LeftSection = styled.div`
 const Title = styled.h1`
   font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   color: #000;
+
+  @media (max-width: 968px) {
+    font-size: 2.2rem;
+  }
 `;
 
 const Description = styled.p`
-  font-size: 1.125rem;
+  font-size: 1.5rem;
   line-height: 1.7;
   color: #000;
+
+  @media (max-width: 968px) {
+    font-size: 1.25rem;
+  }
 `;
 
 const RightSection = styled.div`
@@ -266,8 +274,9 @@ const Select = styled.select`
 const questions = [
   {
     id: 1,
-    title: "١. هل أنت مستثمر أم شركة ناشئة؟",
-    description: "اختر نوع المستخدم لتوجيه تجربتك بشكل أدق.",
+    title: "١. اختر ما يناسبك لتجربة مخصصة أدق",
+    description:
+      "هل أنت مستثمر ---أم شركة ناشئة، أم شركة كبرى تبحث عن شركة ناشئة لحل مشكلة لديك؟ ",
     field: "type",
     type: "toggle",
   },
@@ -386,16 +395,22 @@ const Add = () => {
         <QuestionCard>
           <ToggleContainer>
             <ToggleButton
-              active={formData.type === "investor"}
-              onClick={() => setFormData({ ...formData, type: "investor" })}
+              active={formData.type === "مستثمر"}
+              onClick={() => setFormData({ ...formData, type: "مستثمر" })}
             >
               مستثمر
             </ToggleButton>
             <ToggleButton
-              active={formData.type === "startup"}
-              onClick={() => setFormData({ ...formData, type: "startup" })}
+              active={formData.type === "شركة ناشئة"}
+              onClick={() => setFormData({ ...formData, type: "شركة ناشئة" })}
             >
               شركة ناشئة
+            </ToggleButton>
+            <ToggleButton
+              active={formData.type === "طالب خدمة"}
+              onClick={() => setFormData({ ...formData, type: "طالب خدمة" })}
+            >
+              طالب خدمة
             </ToggleButton>
           </ToggleContainer>
         </QuestionCard>
