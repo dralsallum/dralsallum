@@ -397,7 +397,9 @@ const Problem = () => {
                 {p.type && <Badge>{p.type}</Badge>}{" "}
                 {/* Changed from category to type */}
                 <DateText>
-                  {new Date(p.createdAt).toLocaleDateString("ar-SA")}
+                  {new Date(p.createdAt).toLocaleDateString("ar-SA", {
+                    calendar: "gregory",
+                  })}{" "}
                 </DateText>
               </ProblemCard>
             ))
