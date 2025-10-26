@@ -69,6 +69,7 @@ const Apply = () => {
   const [disciplineOptions, setDisciplineOptions] = useState([]);
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
 
   const professionOptions = {
@@ -144,11 +145,13 @@ const Apply = () => {
       // Handle the response
       const result = await response.json();
       console.log(result);
-      // Maybe show a success message or redirect the user
-      navigate("/");
+
+      // Show success message
+      setShowSuccess(true);
     } catch (error) {
       // Handle any errors
       console.error("There was a problem with the fetch operation:", error);
+      alert("حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.");
     } finally {
       setIsLoading(false);
     }
@@ -229,6 +232,48 @@ const Apply = () => {
     </div>
   );
 
+  // Success message component
+  const SuccessMessage = () => (
+    <div
+      style={{
+        textAlign: "center",
+        padding: "40px 20px",
+        backgroundColor: "#f0fdf4",
+        borderRadius: "8px",
+        border: "2px solid #ff8d67ff",
+      }}
+    >
+      <div
+        style={{
+          fontSize: "48px",
+          color: "#ff8d67ff",
+          marginBottom: "20px",
+        }}
+      >
+        ✓
+      </div>
+      <h2
+        style={{
+          fontSize: "24px",
+          fontWeight: "bold",
+          color: "#ff551cff",
+          marginBottom: "12px",
+        }}
+      >
+        تم إرسال طلبك بنجاح!
+      </h2>
+      <p
+        style={{
+          fontSize: "16px",
+          color: "#ff632fff",
+          marginBottom: "24px",
+        }}
+      >
+        شكراً لتقديم طلبك. سنتواصل معك قريباً.
+      </p>
+    </div>
+  );
+
   return (
     <>
       <ApWrap>
@@ -265,304 +310,341 @@ const Apply = () => {
                         </ApFoNo>
                         <AdCon>
                           <AdConSec>
-                            {isMasterOneVisible && (
-                              <MasterOne>
-                                <TmCon>
-                                  <ConOn>
-                                    <svg></svg>
-                                  </ConOn>
-                                  <ConTo>
-                                    <svg></svg>
-                                  </ConTo>
-                                  <ConTh>
-                                    <svg></svg>
-                                  </ConTh>
-                                  <ConFo>
-                                    <svg></svg>
-                                  </ConFo>
-                                  <ConFi>
-                                    <svg></svg>
-                                  </ConFi>
-                                  <TmEq>
-                                    <TmInCon>
-                                      <TmInSubCon>
-                                        <TmInLab htmlFor="emailInput"></TmInLab>
-                                        <TmIn
-                                          id="emailInput"
-                                          type="email"
-                                          placeholder="ايميل *"
-                                          value={email}
-                                          onChange={handleEmailChange}
-                                        />
-                                        {emailError && (
-                                          <TmInSpan>{emailError}</TmInSpan>
-                                        )}
-                                      </TmInSubCon>
-                                    </TmInCon>
-                                    <TmBut onClick={handleButtonClick}>
-                                      ابدا
-                                    </TmBut>
-                                  </TmEq>
-                                  <a href=""></a>
-                                  <a href=""></a>
-                                  <a href=""></a>
-                                </TmCon>
-                              </MasterOne>
-                            )}
-                            {!isMasterOneVisible && (
-                              <MasterTwo>
-                                <HiWraOn>
-                                  <HiOnLa htmlFor="">ايميل *</HiOnLa>
-                                  <HiOnIn
-                                    id="email"
-                                    type="email"
-                                    placeholder="Email"
-                                    value={email}
-                                    onChange={(e) =>
-                                      handleInputChange(e, setEmail)
-                                    }
-                                    disabled={isLoading}
-                                  />
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiTwLa htmlFor="">رقم الجوال *</HiTwLa>
-                                  <HiOnIn
-                                    id="phone"
-                                    type="text"
-                                    placeholder="رقم الجوال"
-                                    value={phone}
-                                    onChange={(e) =>
-                                      handleInputChange(e, setPhone)
-                                    }
-                                    disabled={isLoading}
-                                  />
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiTwLa htmlFor="">الاسم الاول *</HiTwLa>
-                                  <HiOnIn
-                                    id="firstName"
-                                    type="text"
-                                    placeholder="الاسم الاول"
-                                    value={firstName}
-                                    onChange={(e) =>
-                                      handleInputChange(e, setFirstName)
-                                    }
-                                    disabled={isLoading}
-                                  />
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiTwLa htmlFor="">اسم العائلة *</HiTwLa>
-                                  <HiOnIn
-                                    id="LastName"
-                                    type="text"
-                                    placeholder="اسم العائلة"
-                                    value={lastName}
-                                    onChange={(e) =>
-                                      handleInputChange(e, setLastName)
-                                    }
-                                    disabled={isLoading}
-                                  />
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiFiLa>المهنة *</HiFiLa>
-                                  <HiFiSel
-                                    id="profession"
-                                    value={profession}
-                                    onChange={handleProfessionChange}
-                                    disabled={isLoading}
-                                  >
-                                    <HiFiOp value="">-- اختر المهنة --</HiFiOp>
-                                    {Object.keys(professionOptions).map(
-                                      (key) => (
-                                        <HiFiOp key={key} value={key}>
-                                          {key}
+                            {showSuccess ? (
+                              <SuccessMessage />
+                            ) : (
+                              <>
+                                {isMasterOneVisible && (
+                                  <MasterOne>
+                                    <TmCon>
+                                      <ConOn>
+                                        <svg></svg>
+                                      </ConOn>
+                                      <ConTo>
+                                        <svg></svg>
+                                      </ConTo>
+                                      <ConTh>
+                                        <svg></svg>
+                                      </ConTh>
+                                      <ConFo>
+                                        <svg></svg>
+                                      </ConFo>
+                                      <ConFi>
+                                        <svg></svg>
+                                      </ConFi>
+                                      <TmEq>
+                                        <TmInCon>
+                                          <TmInSubCon>
+                                            <TmInLab htmlFor="emailInput"></TmInLab>
+                                            <TmIn
+                                              id="emailInput"
+                                              type="email"
+                                              placeholder="ايميل *"
+                                              value={email}
+                                              onChange={handleEmailChange}
+                                            />
+                                            {emailError && (
+                                              <TmInSpan>{emailError}</TmInSpan>
+                                            )}
+                                          </TmInSubCon>
+                                        </TmInCon>
+                                        <TmBut onClick={handleButtonClick}>
+                                          ابدا
+                                        </TmBut>
+                                      </TmEq>
+                                      <a href=""></a>
+                                      <a href=""></a>
+                                      <a href=""></a>
+                                    </TmCon>
+                                  </MasterOne>
+                                )}
+                                {!isMasterOneVisible && (
+                                  <MasterTwo>
+                                    <HiWraOn>
+                                      <HiOnLa htmlFor="">ايميل *</HiOnLa>
+                                      <HiOnIn
+                                        id="email"
+                                        type="email"
+                                        placeholder="Email"
+                                        value={email}
+                                        onChange={(e) =>
+                                          handleInputChange(e, setEmail)
+                                        }
+                                        disabled={isLoading}
+                                      />
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiTwLa htmlFor="">رقم الجوال *</HiTwLa>
+                                      <HiOnIn
+                                        id="phone"
+                                        type="text"
+                                        placeholder="رقم الجوال"
+                                        value={phone}
+                                        onChange={(e) =>
+                                          handleInputChange(e, setPhone)
+                                        }
+                                        disabled={isLoading}
+                                      />
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiTwLa htmlFor="">الاسم الاول *</HiTwLa>
+                                      <HiOnIn
+                                        id="firstName"
+                                        type="text"
+                                        placeholder="الاسم الاول"
+                                        value={firstName}
+                                        onChange={(e) =>
+                                          handleInputChange(e, setFirstName)
+                                        }
+                                        disabled={isLoading}
+                                      />
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiTwLa htmlFor="">اسم العائلة *</HiTwLa>
+                                      <HiOnIn
+                                        id="LastName"
+                                        type="text"
+                                        placeholder="اسم العائلة"
+                                        value={lastName}
+                                        onChange={(e) =>
+                                          handleInputChange(e, setLastName)
+                                        }
+                                        disabled={isLoading}
+                                      />
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiFiLa>المهنة *</HiFiLa>
+                                      <HiFiSel
+                                        id="profession"
+                                        value={profession}
+                                        onChange={handleProfessionChange}
+                                        disabled={isLoading}
+                                      >
+                                        <HiFiOp value="">
+                                          -- اختر المهنة --
                                         </HiFiOp>
-                                      )
-                                    )}
-                                  </HiFiSel>
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiFiLa>الشهادة *</HiFiLa>
-                                  <HiFiSel
-                                    id="discipline"
-                                    value={discipline}
-                                    onChange={(e) =>
-                                      handleSelectChange(e, setDiscipline)
-                                    }
-                                    disabled={
-                                      !profession ||
-                                      profession === "اخرى" ||
-                                      isLoading
-                                    }
-                                  >
-                                    <HiFiOp value="">-- اختر الشهادة --</HiFiOp>
-                                    {disciplineOptions.map((option) => (
-                                      <HiFiOp key={option} value={option}>
-                                        {option}
-                                      </HiFiOp>
-                                    ))}
-                                  </HiFiSel>
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiFiLa>تخصصات اخرى *</HiFiLa>
-                                  <HiFiSel
-                                    id="otherSpecialty"
-                                    value={otherSpecialty}
-                                    onChange={(e) =>
-                                      handleSelectChange(e, setOtherSpecialty)
-                                    }
-                                    disabled={
-                                      (profession !== "اخرى" &&
-                                        discipline !== "اخرى") ||
-                                      isLoading
-                                    }
-                                  >
-                                    <HiFiOp value="">-- تخصصات اخرى --</HiFiOp>
-                                    <HiFiOp value="technician">فني</HiFiOp>
-                                    <HiFiOp value="police-officer">
-                                      ضابط شرطة
-                                    </HiFiOp>
-                                    <HiFiOp value="military">عسكري</HiFiOp>
-                                    <HiFiOp value="civil-defense">
-                                      الدفاع المدني
-                                    </HiFiOp>
-                                    <HiFiOp value="firefighter">إطفائي</HiFiOp>
-                                    <HiFiOp value="border-guard">
-                                      حرس الحدود
-                                    </HiFiOp>
-                                    <HiFiOp value="security-guard">
-                                      حارس أمن
-                                    </HiFiOp>
-                                    <HiFiOp value="government-employee">
-                                      موظف حكومي
-                                    </HiFiOp>
-                                    <HiFiOp value="accountant">محاسب</HiFiOp>
-                                    <HiFiOp value="driver">سائق</HiFiOp>
-                                    <HiFiOp value="designer">مصمم</HiFiOp>
-                                  </HiFiSel>
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiFiLa>القطاع *</HiFiLa>
-                                  <HiFiSel
-                                    id="sector"
-                                    value={sector}
-                                    onChange={(e) =>
-                                      handleSelectChange(e, setSector)
-                                    }
-                                    disabled={isLoading}
-                                  >
-                                    <HiFiOp value="">-- اختر القطاع --</HiFiOp>
-                                    <HiFiOp value="government">حكومي</HiFiOp>
-                                    <HiFiOp value="private">خاص</HiFiOp>
-                                  </HiFiSel>
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiFiLa>هل لديك قروض سابقة؟ *</HiFiLa>
-                                  <HiFiSel
-                                    id="hasLoans"
-                                    value={hasLoans}
-                                    onChange={(e) =>
-                                      handleSelectChange(e, setHasLoans)
-                                    }
-                                    disabled={isLoading}
-                                  >
-                                    <HiFiOp value="">-- اختر --</HiFiOp>
-                                    <HiFiOp value="yes">نعم</HiFiOp>
-                                    <HiFiOp value="no">لا</HiFiOp>
-                                  </HiFiSel>
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiFiLa>الراتب الشهري *</HiFiLa>
-                                  <HiFiSel
-                                    id="salaryRange"
-                                    value={salaryRange}
-                                    onChange={(e) =>
-                                      handleSelectChange(e, setSalaryRange)
-                                    }
-                                    disabled={isLoading}
-                                  >
-                                    <HiFiOp value="">
-                                      -- حدد نطاق الراتب --
-                                    </HiFiOp>
-                                    {salaryRanges.map((range, index) => (
-                                      <HiFiOp key={index} value={range}>
-                                        {range}
-                                      </HiFiOp>
-                                    ))}
-                                  </HiFiSel>
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiFiLa>المبلغ المستعد للاستثمار *</HiFiLa>
-                                  <HiFiSel
-                                    id="investmentRange"
-                                    value={investmentRange}
-                                    onChange={(e) =>
-                                      handleSelectChange(e, setInvestmentRange)
-                                    }
-                                    disabled={isLoading}
-                                  >
-                                    <HiFiOp value="">
-                                      -- حدد نطاق الاستثمار --
-                                    </HiFiOp>
-                                    {investmentRanges.map((range, index) => (
-                                      <HiFiOp key={index} value={range}>
-                                        {range}
-                                      </HiFiOp>
-                                    ))}
-                                  </HiFiSel>
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <HiTwLa htmlFor="">السيرة *</HiTwLa>
-                                  <HiOnIn
-                                    id="resume"
-                                    type="file"
-                                    placeholder="resume"
-                                    onChange={(e) => setFile(e.target.files[0])}
-                                    disabled={isLoading}
-                                  />
-                                  <HiOnSp></HiOnSp>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <AgCon>
-                                    <AgPa>* حقول اجبارية</AgPa>
-                                    <AgPa></AgPa>
-                                    <AgPa>
-                                      "أوافق على استلام البريد الإلكتروني،
-                                      والرسائل النصية الآلية والمكالمات الهاتفية
-                                      (بما في ذلك المكالمات التي تحتوي على محتوى
-                                      مُسجل مُسبقًا) من ونيابةً عن اللميديكال،
-                                      والشركات التابعة لها."
-                                      <a href="">اريني المزيد</a>
-                                    </AgPa>
-                                  </AgCon>
-                                </HiWraOn>
-                                <HiWraOn>
-                                  <AgBut
-                                    type="button"
-                                    onClick={submitApplication}
-                                    disabled={isLoading}
-                                    style={{
-                                      opacity: isLoading ? 0.7 : 1,
-                                      cursor: isLoading
-                                        ? "not-allowed"
-                                        : "pointer",
-                                    }}
-                                  >
-                                    {isLoading ? <LoadingSpinner /> : "ارسال!"}
-                                  </AgBut>
-                                </HiWraOn>
-                              </MasterTwo>
+                                        {Object.keys(professionOptions).map(
+                                          (key) => (
+                                            <HiFiOp key={key} value={key}>
+                                              {key}
+                                            </HiFiOp>
+                                          )
+                                        )}
+                                      </HiFiSel>
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiFiLa>الشهادة *</HiFiLa>
+                                      <HiFiSel
+                                        id="discipline"
+                                        value={discipline}
+                                        onChange={(e) =>
+                                          handleSelectChange(e, setDiscipline)
+                                        }
+                                        disabled={
+                                          !profession ||
+                                          profession === "اخرى" ||
+                                          isLoading
+                                        }
+                                      >
+                                        <HiFiOp value="">
+                                          -- اختر الشهادة --
+                                        </HiFiOp>
+                                        {disciplineOptions.map((option) => (
+                                          <HiFiOp key={option} value={option}>
+                                            {option}
+                                          </HiFiOp>
+                                        ))}
+                                      </HiFiSel>
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiFiLa>تخصصات اخرى *</HiFiLa>
+                                      <HiFiSel
+                                        id="otherSpecialty"
+                                        value={otherSpecialty}
+                                        onChange={(e) =>
+                                          handleSelectChange(
+                                            e,
+                                            setOtherSpecialty
+                                          )
+                                        }
+                                        disabled={
+                                          (profession !== "اخرى" &&
+                                            discipline !== "اخرى") ||
+                                          isLoading
+                                        }
+                                      >
+                                        <HiFiOp value="">
+                                          -- تخصصات اخرى --
+                                        </HiFiOp>
+                                        <HiFiOp value="technician">فني</HiFiOp>
+                                        <HiFiOp value="police-officer">
+                                          ضابط شرطة
+                                        </HiFiOp>
+                                        <HiFiOp value="military">عسكري</HiFiOp>
+                                        <HiFiOp value="civil-defense">
+                                          الدفاع المدني
+                                        </HiFiOp>
+                                        <HiFiOp value="firefighter">
+                                          إطفائي
+                                        </HiFiOp>
+                                        <HiFiOp value="border-guard">
+                                          حرس الحدود
+                                        </HiFiOp>
+                                        <HiFiOp value="security-guard">
+                                          حارس أمن
+                                        </HiFiOp>
+                                        <HiFiOp value="government-employee">
+                                          موظف حكومي
+                                        </HiFiOp>
+                                        <HiFiOp value="accountant">
+                                          محاسب
+                                        </HiFiOp>
+                                        <HiFiOp value="driver">سائق</HiFiOp>
+                                        <HiFiOp value="designer">مصمم</HiFiOp>
+                                      </HiFiSel>
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiFiLa>القطاع *</HiFiLa>
+                                      <HiFiSel
+                                        id="sector"
+                                        value={sector}
+                                        onChange={(e) =>
+                                          handleSelectChange(e, setSector)
+                                        }
+                                        disabled={isLoading}
+                                      >
+                                        <HiFiOp value="">
+                                          -- اختر القطاع --
+                                        </HiFiOp>
+                                        <HiFiOp value="government">
+                                          حكومي
+                                        </HiFiOp>
+                                        <HiFiOp value="private">خاص</HiFiOp>
+                                      </HiFiSel>
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiFiLa>هل لديك قروض سابقة؟ *</HiFiLa>
+                                      <HiFiSel
+                                        id="hasLoans"
+                                        value={hasLoans}
+                                        onChange={(e) =>
+                                          handleSelectChange(e, setHasLoans)
+                                        }
+                                        disabled={isLoading}
+                                      >
+                                        <HiFiOp value="">-- اختر --</HiFiOp>
+                                        <HiFiOp value="yes">نعم</HiFiOp>
+                                        <HiFiOp value="no">لا</HiFiOp>
+                                      </HiFiSel>
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiFiLa>الراتب الشهري *</HiFiLa>
+                                      <HiFiSel
+                                        id="salaryRange"
+                                        value={salaryRange}
+                                        onChange={(e) =>
+                                          handleSelectChange(e, setSalaryRange)
+                                        }
+                                        disabled={isLoading}
+                                      >
+                                        <HiFiOp value="">
+                                          -- حدد نطاق الراتب --
+                                        </HiFiOp>
+                                        {salaryRanges.map((range, index) => (
+                                          <HiFiOp key={index} value={range}>
+                                            {range}
+                                          </HiFiOp>
+                                        ))}
+                                      </HiFiSel>
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiFiLa>
+                                        المبلغ المستعد للاستثمار *
+                                      </HiFiLa>
+                                      <HiFiSel
+                                        id="investmentRange"
+                                        value={investmentRange}
+                                        onChange={(e) =>
+                                          handleSelectChange(
+                                            e,
+                                            setInvestmentRange
+                                          )
+                                        }
+                                        disabled={isLoading}
+                                      >
+                                        <HiFiOp value="">
+                                          -- حدد نطاق الاستثمار --
+                                        </HiFiOp>
+                                        {investmentRanges.map(
+                                          (range, index) => (
+                                            <HiFiOp key={index} value={range}>
+                                              {range}
+                                            </HiFiOp>
+                                          )
+                                        )}
+                                      </HiFiSel>
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <HiTwLa htmlFor="">السيرة *</HiTwLa>
+                                      <HiOnIn
+                                        id="resume"
+                                        type="file"
+                                        placeholder="resume"
+                                        onChange={(e) =>
+                                          setFile(e.target.files[0])
+                                        }
+                                        disabled={isLoading}
+                                      />
+                                      <HiOnSp></HiOnSp>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <AgCon>
+                                        <AgPa>* حقول اجبارية</AgPa>
+                                        <AgPa></AgPa>
+                                        <AgPa>
+                                          "أوافق على استلام البريد الإلكتروني،
+                                          والرسائل النصية الآلية والمكالمات
+                                          الهاتفية (بما في ذلك المكالمات التي
+                                          تحتوي على محتوى مُسجل مُسبقًا) من
+                                          ونيابةً عن اللميديكال، والشركات
+                                          التابعة لها."
+                                          <a href="">اريني المزيد</a>
+                                        </AgPa>
+                                      </AgCon>
+                                    </HiWraOn>
+                                    <HiWraOn>
+                                      <AgBut
+                                        type="button"
+                                        onClick={submitApplication}
+                                        disabled={isLoading}
+                                        style={{
+                                          opacity: isLoading ? 0.7 : 1,
+                                          cursor: isLoading
+                                            ? "not-allowed"
+                                            : "pointer",
+                                        }}
+                                      >
+                                        {isLoading ? (
+                                          <LoadingSpinner />
+                                        ) : (
+                                          "ارسال!"
+                                        )}
+                                      </AgBut>
+                                    </HiWraOn>
+                                  </MasterTwo>
+                                )}
+                              </>
                             )}
                           </AdConSec>
                         </AdCon>
