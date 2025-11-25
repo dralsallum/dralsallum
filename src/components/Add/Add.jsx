@@ -323,6 +323,13 @@ const questions = [
     placeholder: "اسمك الكامل أو اسم مستعار",
     field: "author",
   },
+  {
+    id: 8,
+    title: "٧. ما هو حسابك على التيليقرام",
+    description: "ادخل لحسابك بالتليقرام وانسخ رابط الحساب.",
+    placeholder: "مثال: https://t.me/draalsallum",
+    field: "telegram",
+  },
 ];
 
 /* ========== Component ========== */
@@ -337,6 +344,7 @@ const Add = () => {
     attempts: "",
     pay: "",
     author: "",
+    telegram: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
