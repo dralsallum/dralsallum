@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { publicRequest } from "../../requestMethods";
 import NavTech from "../NavTech/NavTech";
+import { useNavigate } from "react-router-dom";
 
 /* 🎨 Elegant Color Palette (matches your image) */
 const COLORS = {
@@ -213,12 +214,15 @@ const Invest = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const getId = () => {
     const path = window.location.pathname;
     const segments = path.split("/");
     return segments[segments.length - 1];
   };
+
+  const handleNavigate = (des) => navigate(des);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -234,6 +238,7 @@ const Invest = () => {
         setLoading(true);
         const response = await publicRequest.get(`/combinator/${id}`);
         setData(response.data);
+
         setError(null);
       } catch (err) {
         setError("فشل تحميل تفاصيل المشروع");
@@ -317,7 +322,14 @@ const Invest = () => {
               {data.author.split(",")[1]?.trim() || "غير محددة"}
             </AuthorField>
             <AuthorField>
-              <span>وسيلة التواصل:</span> <Link href="#">تيليجرام</Link>
+              <span>وسيلة التواصل:</span>{" "}
+              <Link
+                href={data.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                تيليجرام
+              </Link>
             </AuthorField>
           </AuthorInfo>
         </Section>
