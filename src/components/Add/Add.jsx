@@ -325,6 +325,14 @@ const questions = [
   },
   {
     id: 8,
+    title: "٧. دولة إقامتك وعمل المشروع",
+    description:
+      "اذكر الدولة التي تقيم فيها والدولة التي سيتم تنفيذ المشروع فيها.",
+    placeholder: "مثال: المملكة العربية السعودية",
+    field: "country",
+  },
+  {
+    id: 9,
     title: "٧. ما هو حسابك على التيليقرام",
     description: "ادخل لحسابك بالتليقرام وانسخ رابط الحساب.",
     placeholder: "مثال: https://t.me/draalsallum",
@@ -344,6 +352,7 @@ const Add = () => {
     attempts: "",
     pay: "",
     author: "",
+    country: "",
     telegram: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);

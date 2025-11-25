@@ -214,15 +214,12 @@ const Invest = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   const getId = () => {
     const path = window.location.pathname;
     const segments = path.split("/");
     return segments[segments.length - 1];
   };
-
-  const handleNavigate = (des) => navigate(des);
 
   useEffect(() => {
     const fetchData = async () => {
