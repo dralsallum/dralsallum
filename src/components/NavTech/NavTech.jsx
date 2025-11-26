@@ -711,8 +711,7 @@ const SeeMoreLink = styled(Link)`
 
 const NavTech = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isBrowseOpen, setIsBrowseOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("specialties");
+
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.currentUser);
 
@@ -720,46 +719,10 @@ const NavTech = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const toggleBrowse = () => {
-    setIsBrowseOpen(!isBrowseOpen);
-    setIsMenuOpen(false);
-  };
-
-  const handleMobileBrowseClick = () => {
-    setIsMenuOpen(false);
-    setTimeout(() => {
-      setIsBrowseOpen(true);
-    }, 150);
-  };
-
   const handleSignOut = () => {
     dispatch(signOut());
     setIsMenuOpen(false);
   };
-
-  const specialties = [
-    {
-      name: "المعالجون بتقويم العمود الفقري",
-      path: "/reservation/chiropractors",
-    },
-    { name: "أطباء الغدد الصماء", path: "/reservation/endocrinologists" },
-    { name: "أخصائيو البصريات", path: "/reservation/optometrists" },
-    { name: "أطباء نفسيون", path: "/reservation/psychiatrists" },
-    { name: "أطباء الأسنان", path: "/reservation/dentists" },
-    { name: "أطباء العيون", path: "/reservation/eye-doctors" },
-    { name: "جراحو العظام", path: "/reservation/orthopedic-surgeons" },
-    { name: "أخصائيو علم النفس", path: "/reservation/psychologists" },
-    { name: "أطباء الجلدية", path: "/reservation/dermatologists" },
-    { name: "أطباء التوليد وأمراض النساء", path: "/reservation/obgyns" },
-    { name: "أطباء الأطفال", path: "/reservation/podiatrists" },
-    {
-      name: "المعالجون النفسيون والمستشارون",
-      path: "/reservation/therapist-counselors",
-    },
-    { name: "أطباء الأنف والأذن والحنجرة", path: "/reservation/ent" },
-    { name: "أطباء العيون", path: "/reservation/ophthalmologists" },
-    { name: "أطباء الرعاية الأولية", path: "/reservation/primary-care" },
-  ];
 
   return (
     <>
@@ -769,10 +732,10 @@ const NavTech = () => {
         </Logo>
 
         <NavLinks>
-          <BrowseButton onClick={toggleBrowse}>تصفّح</BrowseButton>
-          <NavLinkStyled to="/support">المساعدة</NavLinkStyled>
-          <NavLinkStyled to="/upload">أضف شركتك لطلب استثمار</NavLinkStyled>
-          <NavLinkStyled to="/newsletter">النشرة البريدية</NavLinkStyled>
+          <NavLinkStyled to="/audio">بودكاست</NavLinkStyled>
+          <NavLinkStyled to="/job">تطبيق الانجليزي</NavLinkStyled>
+          <NavLinkStyled to="/task">استثمر بشركات ناشئة</NavLinkStyled>
+          <NavLinkStyled to="/personality">أكاديمية التعلم</NavLinkStyled>
         </NavLinks>
 
         {currentUser ? (
@@ -796,61 +759,6 @@ const NavTech = () => {
           <UploadButton to="/task">استثمر بشركات ناشئة</UploadButton>
         </MobileButtonGroup>
       </Header>
-
-      {/* Browse Modal */}
-      {isBrowseOpen && (
-        <BrowseModalOverlay onClick={toggleBrowse}>
-          <BrowseModalContent onClick={(e) => e.stopPropagation()}>
-            <CloseButton onClick={toggleBrowse}>✕</CloseButton>
-
-            <TabContainer>
-              <Tab
-                active={activeTab === "procedures"}
-                onClick={() => setActiveTab("procedures")}
-              >
-                الإجراءات
-              </Tab>
-              <Tab
-                active={activeTab === "specialties"}
-                onClick={() => setActiveTab("specialties")}
-              >
-                التخصصات
-              </Tab>
-            </TabContainer>
-
-            {activeTab === "specialties" && (
-              <>
-                <BrowseTitle>تصفح أفضل التخصصات</BrowseTitle>
-                <SpecialtiesGrid>
-                  {specialties.map((specialty, index) => (
-                    <SpecialtyLink
-                      key={index}
-                      to={specialty.path}
-                      onClick={toggleBrowse}
-                    >
-                      {specialty.name}
-                    </SpecialtyLink>
-                  ))}
-                  <SeeMoreLink to="/" onClick={toggleBrowse}>
-                    عرض المزيد من التخصصات
-                  </SeeMoreLink>
-                </SpecialtiesGrid>
-              </>
-            )}
-
-            {activeTab === "procedures" && (
-              <>
-                <BrowseTitle>تصفح الإجراءات الطبية</BrowseTitle>
-                <SpecialtiesGrid>
-                  <p style={{ textAlign: "right", color: "#666" }}>
-                    سيتم إضافة الإجراءات قريبًا
-                  </p>
-                </SpecialtiesGrid>
-              </>
-            )}
-          </BrowseModalContent>
-        </BrowseModalOverlay>
-      )}
 
       {/* Mobile Menu */}
       {isMenuOpen && (
