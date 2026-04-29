@@ -34,3 +34,4 @@ export { default as Apply } from "./Apply/Apply";
 export { default as Problem } from "./Problem/Problem";
 export { default as Add } from "./Add/Add";
 export { default as Invest } from "./Invest/Invest";
+export { default as Medical } from "./Medical/Medical";

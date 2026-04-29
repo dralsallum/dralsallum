@@ -16,7 +16,7 @@ import Personal from "./pages/personal";
 import Audio from "./pages/Audio";
 import Outcome from "./pages/Outcome";
 import Job from "./pages/Job";
-import { Invest, OrderComplete } from "./components";
+import { Invest, Medical, OrderComplete } from "./components";
 import Lesson from "./pages/Lesson";
 import Teach from "./pages/Teach";
 import Login from "./pages/Login";
@@ -55,6 +55,7 @@ const App = () => {
         <Route path="/transfer" element={<Transfer />} />
         <Route path="/task" element={<Task />} />
         <Route path="/shares" element={<Share />} />
+        <Route path="/medical" element={<Medical />} />
         <Route path="/policy" element={<Policy />} />
         <Route path="/audio" element={<Audio />} />
         <Route path="/product/:category" element={<Product />} />

@@ -37,7 +37,9 @@ const CardLink = styled(Link)`
   background-color: #f8f6f2;
   border-radius: 8px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, background-color 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease;
   cursor: pointer;
   text-decoration: none;
   display: block;
@@ -123,13 +125,13 @@ const Last = () => {
       description:
         "تعلم كيف تنفذ بكفاءة، وتوفر وقتك للأشياء المهمة وتستمتع في العملية.",
       icon: "gears",
-      href: "/main/إنتاجية%20عالية:%20مفتاح%20النجاح%20والتوازن%20في%20الحياة",
+      href: "/main/رحلة الإنتاجية: خطوات لتحقيق أقصى استفادة من وقتك",
     },
     {
       title: "أنشئ دخلًا عبر الإنترنت",
       description: "تعلم استراتيجيات لإنشاء مصادر دخل عبر الإنترنت مستدامة.",
       icon: "money",
-      href: "/main/طرق%20جني%20الأموال%20عبر%20الإنترنت:%20استراتيجيات%20لتحقيق%20الدخل%20الرقمي",
+      href: "/main/الربح من الإنترنت: دليلك الشامل لبناء مصدر دخل رقمي",
     },
   ];
 
