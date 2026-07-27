@@ -145,38 +145,6 @@ const MobileButtonGroup = styled.div`
   }
 `;
 
-const UploadButton = styled(Link)`
-  display: none;
-
-  @media (max-width: 768px) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #fff;
-    color: #ff7143;
-    border: 2px solid #ff7143;
-    height: 40px;
-    padding: 0 0.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 800;
-    white-space: nowrap;
-
-    &:active {
-      background: #f8f6f2;
-      outline: none;
-    }
-
-    &:focus {
-      outline: none;
-      color: #ff7143;
-    }
-  }
-`;
-
 const MenuButton = styled.button`
   display: none;
 
@@ -756,7 +724,6 @@ const NavTech = () => {
               <MenuIcon src={Menu} alt="Menu" />
             )}
           </MenuButton>
-          <UploadButton to="/task">استثمر بشركات ناشئة</UploadButton>
         </MobileButtonGroup>
       </Header>
 
